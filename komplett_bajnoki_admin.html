@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Összevont Bajnoki Admin</title>
+<title>Komplett Bajnoki Admin</title>
 <style>
     body {
         background-color: #00122e;
@@ -24,7 +24,7 @@
     }
     .section-title {
         text-align: center;
-        color: #3fb950;
+        color: #ffff00;
         margin-top: 10px;
         margin-bottom: 15px;
         font-size: 1.5rem;
@@ -72,22 +72,8 @@
 
 <div class="admin-container">
     
-    <!-- FELNŐTT MECCS SECTION -->
-    <div class="section-title">Felnőtt Bajnoki Mérkőzés (6 fős)</div>
-    <div style="text-align: center; margin-bottom: 15px;">
-        <input type="text" id="titleAdult" value="FELNŐTT BAJNOKI MÉRKŐZÉS" placeholder="Felnőtt Mérkőzés Megnevezése" oninput="sendAdminData()" style="width: 80%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 8px; text-align: center; font-size: 1.1rem; border-radius: 5px; font-weight: bold;">
-    </div>
-    <div class="admin-header-inputs">
-        <input type="text" id="team1Adult" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()">
-        <input type="text" id="team2Adult" placeholder="Vendég Csapat" value="Vendég" oninput="sendAdminData()">
-    </div>
-    <div id="adminAdultPairs"></div>
-
-    <!-- HATÁROZOTT ELVÁLASZTÓ CSÍK -->
-    <div class="section-divider"></div>
-
-    <!-- IFI MECCS SECTION -->
-    <div class="section-title" style="color: #ffff00;">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
+    <!-- IFI MECCS SECTION (ELŐL) -->
+    <div class="section-title">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
     <div style="text-align: center; margin-bottom: 15px;">
         <input type="text" id="titleIfi" value="IFI BAJNOKI MÉRKŐZÉS" placeholder="Ifi Mérkőzés Megnevezése" oninput="sendAdminData()" style="width: 80%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 8px; text-align: center; font-size: 1.1rem; border-radius: 5px; font-weight: bold;">
     </div>
@@ -96,6 +82,20 @@
         <input type="text" id="team2Ifi" placeholder="Vendég Ifi Csapat" value="Vendég Ifi" oninput="sendAdminData()">
     </div>
     <div id="adminIfiPairs"></div>
+
+    <!-- HATÁROZOTT ELVÁLASZTÓ CSÍK -->
+    <div class="section-divider"></div>
+
+    <!-- FELNŐTT MECCS SECTION -->
+    <div class="section-title" style="color: #3fb950;">Felnőtt Bajnoki Mérkőzés (6 fős)</div>
+    <div style="text-align: center; margin-bottom: 15px;">
+        <input type="text" id="titleAdult" value="FELNŐTT BAJNOKI MÉRKŐZÉS" placeholder="Felnőtt Mérkőzés Megnevezése" oninput="sendAdminData()" style="width: 80%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 8px; text-align: center; font-size: 1.1rem; border-radius: 5px; font-weight: bold;">
+    </div>
+    <div class="admin-header-inputs">
+        <input type="text" id="team1Adult" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()">
+        <input type="text" id="team2Adult" placeholder="Vendég Csapat" value="Vendég" oninput="sendAdminData()">
+    </div>
+    <div id="adminAdultPairs"></div>
 
 </div>
 
@@ -152,42 +152,42 @@ function extractPairsData(containerId) {
 
 function sendAdminData() {
     const data = {
-        adult: {
-            title: document.getElementById('titleAdult').value,
-            team1: document.getElementById('team1Adult').value,
-            team2: document.getElementById('team2Adult').value,
-            pairs: extractPairsData('adminAdultPairs')
-        },
         ifi: {
             title: document.getElementById('titleIfi').value,
             team1: document.getElementById('team1Ifi').value,
             team2: document.getElementById('team2Ifi').value,
             pairs: extractPairsData('adminIfiPairs')
+        },
+        adult: {
+            title: document.getElementById('titleAdult').value,
+            team1: document.getElementById('team1Adult').value,
+            team2: document.getElementById('team2Adult').value,
+            pairs: extractPairsData('adminAdultPairs')
         }
     };
 
     db.ref('osszevont_bajnoki_bowling').set(data);
 }
 
-// Inicializálás
-generatePairInputs('adminAdultPairs', 6, 'adult');
+// Inicializálás: Ifi elől (2 fős), Felnőtt alul (6 fős)
 generatePairInputs('adminIfiPairs', 2, 'ifi');
+generatePairInputs('adminAdultPairs', 6, 'adult');
 
 // Adatok betöltése
 db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
-        if (data.adult) {
-            document.getElementById('titleAdult').value = data.adult.title || '';
-            document.getElementById('team1Adult').value = data.adult.team1 || '';
-            document.getElementById('team2Adult').value = data.adult.team2 || '';
-            populatePairs('adminAdultPairs', data.adult.pairs);
-        }
         if (data.ifi) {
             document.getElementById('titleIfi').value = data.ifi.title || '';
             document.getElementById('team1Ifi').value = data.ifi.team1 || '';
             document.getElementById('team2Ifi').value = data.ifi.team2 || '';
             populatePairs('adminIfiPairs', data.ifi.pairs);
+        }
+        if (data.adult) {
+            document.getElementById('titleAdult').value = data.adult.title || '';
+            document.getElementById('team1Adult').value = data.adult.team1 || '';
+            document.getElementById('team2Adult').value = data.adult.team2 || '';
+            populatePairs('adminAdultPairs', data.adult.pairs);
         }
     }
 });
