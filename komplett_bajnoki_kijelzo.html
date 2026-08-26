@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Összevont Bajnoki Kijelző</title>
+<title>Komplett Bajnoki Kijelző</title>
 <style>
     body {
         background-color: #000c1f;
@@ -103,44 +103,9 @@
 
 <div class="main-board">
 
-    <!-- FELNŐTT MECCS BLOKK -->
-    <div class="match-block" id="blockAdult">
-        <div class="tournament-header" id="titleAdult">FELNŐTT BAJNOKI MÉRKŐZÉS</div>
-        <div class="teams-header">
-            <span id="team1Adult">HAZAI</span>
-            <span id="team2Adult">VENDÉG</span>
-        </div>
-        <table class="board-table">
-            <thead>
-                <tr>
-                    <th class="name-col">Név</th>
-                    <th>1</th><th>2</th><th>3</th><th>4</th><th>SP</th>
-                    <th>Össz.</th><th>MP</th><th>Össz.</th><th>SP</th>
-                    <th>4</th><th>3</th><th>2</th><th>1</th>
-                    <th class="name-col right">Név</th>
-                </tr>
-            </thead>
-            <tbody id="bodyAdult"></tbody>
-        </table>
-        <div class="footer-score">
-            <div class="footer-team-block">
-                <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Adult">0</span></div>
-                <div><span class="footer-label">Össz:</span> <span class="footer-val" id="ges1Adult">0</span></div>
-            </div>
-            <div class="total-mp" id="mpAdult">0 : 0</div>
-            <div class="footer-team-block">
-                <div><span class="footer-label">Össz:</span> <span class="footer-val" id="ges2Adult">0</span></div>
-                <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Adult">0</span></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ELVÁLASZTÓ CSÍK -->
-    <div class="match-divider"></div>
-
-    <!-- IFI MECCS BLOKK -->
+    <!-- IFI MECCS BLOKK (ELŐL) -->
     <div class="match-block" id="blockIfi">
-        <div class="tournament-header" id="titleIfi" style="color: #00ff66;">IFI BAJNOKI MÉRKŐZÉS</div>
+        <div class="tournament-header" id="titleIfi">IFI BAJNOKI MÉRKŐZÉS</div>
         <div class="teams-header">
             <span id="team1Ifi">HAZAI IFI</span>
             <span id="team2Ifi">VENDÉG IFI</span>
@@ -170,6 +135,41 @@
         </div>
     </div>
 
+    <!-- ELVÁLASZTÓ CSÍK -->
+    <div class="match-divider"></div>
+
+    <!-- FELNŐTT MECCS BLOKK -->
+    <div class="match-block" id="blockAdult">
+        <div class="tournament-header" id="titleAdult" style="color: #00ff66;">FELNŐTT BAJNOKI MÉRKŐZÉS</div>
+        <div class="teams-header">
+            <span id="team1Adult">HAZAI</span>
+            <span id="team2Adult">VENDÉG</span>
+        </div>
+        <table class="board-table">
+            <thead>
+                <tr>
+                    <th class="name-col">Név</th>
+                    <th>1</th><th>2</th><th>3</th><th>4</th><th>SP</th>
+                    <th>Össz.</th><th>MP</th><th>Össz.</th><th>SP</th>
+                    <th>4</th><th>3</th><th>2</th><th>1</th>
+                    <th class="name-col right">Név</th>
+                </tr>
+            </thead>
+            <tbody id="bodyAdult"></tbody>
+        </table>
+        <div class="footer-score">
+            <div class="footer-team-block">
+                <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Adult">0</span></div>
+                <div><span class="footer-label">Össz:</span> <span class="footer-val" id="ges1Adult">0</span></div>
+            </div>
+            <div class="total-mp" id="mpAdult">0 : 0</div>
+            <div class="footer-team-block">
+                <div><span class="footer-label">Össz:</span> <span class="footer-val" id="ges2Adult">0</span></div>
+                <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Adult">0</span></div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
@@ -189,8 +189,8 @@ const db = firebase.database();
 db.ref('osszevont_bajnoki_bowling').on('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
-        if (data.adult) renderSection('Adult', data.adult);
         if (data.ifi) renderSection('Ifi', data.ifi);
+        if (data.adult) renderSection('Adult', data.adult);
     }
 });
 
