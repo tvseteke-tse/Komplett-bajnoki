@@ -57,26 +57,27 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 2.2rem;
         padding: 4px 10px;
         border-bottom: 2px solid #0044aa;
-        color: #ffff00;
-        font-weight: bold;
-        text-transform: uppercase;
-        text-shadow: 0 0 6px rgba(255, 255, 0, 0.3);
     }
 
     .team-box {
         display: flex;
         align-items: center;
         gap: 15px;
+        font-size: 2.2rem;
+        color: #ffff00;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-shadow: 0 0 6px rgba(255, 255, 0, 0.3);
     }
     
     .team-logo {
-        height: 45px;
-        width: 45px;
+        height: 48px;
+        width: auto;
+        max-width: 70px;
         object-fit: contain;
-        display: none; /* Alapértelmezetten rejtve, ha nincs kép */
+        display: inline-block;
     }
 
     .table-container {
@@ -183,7 +184,7 @@
         <div class="tournament-header" id="titleIfi">IFI BAJNOKI MÉRKŐZÉS</div>
         <div class="teams-header">
             <div class="team-box">
-                <img id="logo1Ifi" class="team-logo" src="" alt="">
+                <img id="logo1Ifi" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" alt="">
                 <span id="team1Ifi">HAZAI IFI</span>
             </div>
             <div class="team-box">
@@ -227,7 +228,7 @@
         <div class="tournament-header" id="titleAdult">FELNŐTT BAJNOKI MÉRKŐZÉS</div>
         <div class="teams-header">
             <div class="team-box">
-                <img id="logo1Adult" class="team-logo" src="" alt="">
+                <img id="logo1Adult" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" alt="">
                 <span id="team1Adult">HAZAI</span>
             </div>
             <div class="team-box">
@@ -267,6 +268,8 @@
 </div>
 
 <script>
+const DEFAULT_HAZAI_LOGO = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png";
+
 const firebaseConfig = {
     apiKey: "aizasyd8o7xyctxtjlqcm8z-29xtbopbxrybjom",
     authDomain: "teke-eredmenyek.firebaseapp.com",
@@ -295,10 +298,12 @@ function getSetClass(val1, val2) {
     return 'val-set draw';
 }
 
-function updateLogo(elementId, logoUrl) {
+function updateLogo(elementId, logoUrl, fallbackUrl = '') {
     const imgEl = document.getElementById(elementId);
-    if (logoUrl && logoUrl.trim() !== '') {
-        imgEl.src = logoUrl;
+    const targetUrl = (logoUrl && logoUrl.trim() !== '') ? logoUrl : fallbackUrl;
+    
+    if (targetUrl) {
+        imgEl.src = targetUrl;
         imgEl.style.display = 'inline-block';
     } else {
         imgEl.style.display = 'none';
@@ -311,8 +316,7 @@ function renderSection(type, sectionData) {
     document.getElementById(`team1${type}`).innerText = sectionData.team1 || 'HAZAI';
     document.getElementById(`team2${type}`).innerText = sectionData.team2 || 'VENDÉG';
 
-    // Logók frissítése
-    updateLogo(`logo1${type}`, sectionData.logo1);
+    updateLogo(`logo1${type}`, sectionData.logo1, DEFAULT_HAZAI_LOGO);
     updateLogo(`logo2${type}`, sectionData.logo2);
 
     const tbody = document.getElementById(`body${type}`);
