@@ -37,7 +37,6 @@
         gap: 15px;
         margin-bottom: 20px;
     }
-    /* Csapatnév és logó mezők egymás mellé rendezése */
     .team-input-row {
         display: flex;
         gap: 8px;
@@ -76,7 +75,6 @@
     .sets-inputs { display: flex; gap: 6px; }
     .sets-inputs input[type="number"] { width: 45px; background: #1a1a1a; border: 1px solid #444; color: #00ff66; text-align: center; padding: 6px; font-weight: bold; border-radius: 4px; }
 
-    /* HATÁROZOTT ELVÁLASZTÓ CSÍK */
     .section-divider {
         height: 6px;
         background: linear-gradient(90deg, #0044aa, #00ff66, #0044aa);
@@ -86,7 +84,6 @@
     }
 </style>
 
-<!-- Firebase SDK-k -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -102,7 +99,7 @@
     <div class="admin-header-inputs">
         <div class="team-input-row">
             <input type="text" id="team1Ifi" class="team-name" placeholder="Hazai Ifi Csapat" value="Hazai Ifi" oninput="sendAdminData()">
-            <input type="text" id="logo1Ifi" class="logo-url" placeholder="Hazai Logó URL" oninput="sendAdminData()">
+            <input type="text" id="logo1Ifi" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="sendAdminData()">
         </div>
         <div class="team-input-row">
             <input type="text" id="logo2Ifi" class="logo-url" placeholder="Vendég Logó URL" oninput="sendAdminData()">
@@ -122,7 +119,7 @@
     <div class="admin-header-inputs">
         <div class="team-input-row">
             <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()">
-            <input type="text" id="logo1Adult" class="logo-url" placeholder="Hazai Logó URL" oninput="sendAdminData()">
+            <input type="text" id="logo1Adult" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="sendAdminData()">
         </div>
         <div class="team-input-row">
             <input type="text" id="logo2Adult" class="logo-url" placeholder="Vendég Logó URL" oninput="sendAdminData()">
@@ -207,11 +204,9 @@ function sendAdminData() {
     db.ref('osszevont_bajnoki_bowling').set(data);
 }
 
-// Inicializálás: Ifi elől (2 fős), Felnőtt alul (6 fős)
 generatePairInputs('adminIfiPairs', 2, 'ifi');
 generatePairInputs('adminAdultPairs', 6, 'adult');
 
-// Adatok betöltése
 db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -219,7 +214,7 @@ db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
             document.getElementById('titleIfi').value = data.ifi.title || '';
             document.getElementById('team1Ifi').value = data.ifi.team1 || '';
             document.getElementById('team2Ifi').value = data.ifi.team2 || '';
-            document.getElementById('logo1Ifi').value = data.ifi.logo1 || '';
+            document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
             document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
             populatePairs('adminIfiPairs', data.ifi.pairs);
         }
@@ -227,7 +222,7 @@ db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
             document.getElementById('titleAdult').value = data.adult.title || '';
             document.getElementById('team1Adult').value = data.adult.team1 || '';
             document.getElementById('team2Adult').value = data.adult.team2 || '';
-            document.getElementById('logo1Adult').value = data.adult.logo1 || '';
+            document.getElementById('logo1Adult').value = data.adult.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
             document.getElementById('logo2Adult').value = data.adult.logo2 || '';
             populatePairs('adminAdultPairs', data.adult.pairs);
         }
