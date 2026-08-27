@@ -39,13 +39,8 @@
         justify-content: space-between;
     }
     
-    /* Magasságok arányosítása a 1080p felbontáshoz */
-    #blockIfi {
-        flex: 0 0 32%;
-    }
-    #blockAdult {
-        flex: 0 0 64%;
-    }
+    #blockIfi { flex: 0 0 32%; }
+    #blockAdult { flex: 0 0 64%; }
 
     .tournament-header {
         text-align: center;
@@ -58,10 +53,10 @@
         line-height: 1.1;
     }
 
-    /* Megnövelt csapatnevek */
     .teams-header {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         font-size: 2.2rem;
         padding: 4px 10px;
         border-bottom: 2px solid #0044aa;
@@ -70,7 +65,20 @@
         text-transform: uppercase;
         text-shadow: 0 0 6px rgba(255, 255, 0, 0.3);
     }
+
+    .team-box {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
     
+    .team-logo {
+        height: 45px;
+        width: 45px;
+        object-fit: contain;
+        display: none; /* Alapértelmezetten rejtve, ha nincs kép */
+    }
+
     .table-container {
         flex: 1;
         display: flex;
@@ -135,7 +143,6 @@
     .footer-label { color: #8b949e; font-size: 1.1rem; }
     .footer-val { color: #ffff00; font-weight: bold; font-size: 1.5rem; }
     
-    /* Végeredmény és az Összesített fák feliratok egységes stílusa */
     .footer-center-group {
         display: flex;
         align-items: center;
@@ -155,7 +162,6 @@
         line-height: 1; 
     }
 
-    /* LÁTVÁNYOS ELVÁLASZTÓ SÁV */
     .match-divider {
         height: 6px;
         background: linear-gradient(90deg, #0044aa, #00ff66, #ffff00, #00ff66, #0044aa);
@@ -165,7 +171,6 @@
     }
 </style>
 
-<!-- Firebase SDK-k -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
@@ -173,12 +178,18 @@
 
 <div class="main-board">
 
-    <!-- IFI MECCS BLOKK (2 fős) -->
+    <!-- IFI MECCS BLOKK -->
     <div class="match-block" id="blockIfi">
         <div class="tournament-header" id="titleIfi">IFI BAJNOKI MÉRKŐZÉS</div>
         <div class="teams-header">
-            <span id="team1Ifi">HAZAI IFI</span>
-            <span id="team2Ifi">VENDÉG IFI</span>
+            <div class="team-box">
+                <img id="logo1Ifi" class="team-logo" src="" alt="">
+                <span id="team1Ifi">HAZAI IFI</span>
+            </div>
+            <div class="team-box">
+                <span id="team2Ifi">VENDÉG IFI</span>
+                <img id="logo2Ifi" class="team-logo" src="" alt="">
+            </div>
         </div>
         <div class="table-container">
             <table class="board-table">
@@ -198,28 +209,31 @@
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Ifi">0</span></div>
             </div>
-            
             <div class="footer-center-group">
                 <div class="total-ges-big"><span id="ges1Ifi">0</span> fa</div>
                 <div class="total-mp" id="mpIfi">0 : 0</div>
                 <div class="total-ges-big"><span id="ges2Ifi">0</span> fa</div>
             </div>
-
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Ifi">0</span></div>
             </div>
         </div>
     </div>
 
-    <!-- ELVÁLASZTÓ CSÍK -->
     <div class="match-divider"></div>
 
-    <!-- FELNŐTT MECCS BLOKK (6 fős) -->
+    <!-- FELNŐTT MECCS BLOKK -->
     <div class="match-block" id="blockAdult">
         <div class="tournament-header" id="titleAdult">FELNŐTT BAJNOKI MÉRKŐZÉS</div>
         <div class="teams-header">
-            <span id="team1Adult">HAZAI</span>
-            <span id="team2Adult">VENDÉG</span>
+            <div class="team-box">
+                <img id="logo1Adult" class="team-logo" src="" alt="">
+                <span id="team1Adult">HAZAI</span>
+            </div>
+            <div class="team-box">
+                <span id="team2Adult">VENDÉG</span>
+                <img id="logo2Adult" class="team-logo" src="" alt="">
+            </div>
         </div>
         <div class="table-container">
             <table class="board-table">
@@ -239,13 +253,11 @@
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Adult">0</span></div>
             </div>
-
             <div class="footer-center-group">
                 <div class="total-ges-big"><span id="ges1Adult">0</span> fa</div>
                 <div class="total-mp" id="mpAdult">0 : 0</div>
                 <div class="total-ges-big"><span id="ges2Adult">0</span> fa</div>
             </div>
-
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Adult">0</span></div>
             </div>
@@ -283,10 +295,25 @@ function getSetClass(val1, val2) {
     return 'val-set draw';
 }
 
+function updateLogo(elementId, logoUrl) {
+    const imgEl = document.getElementById(elementId);
+    if (logoUrl && logoUrl.trim() !== '') {
+        imgEl.src = logoUrl;
+        imgEl.style.display = 'inline-block';
+    } else {
+        imgEl.style.display = 'none';
+        imgEl.src = '';
+    }
+}
+
 function renderSection(type, sectionData) {
     if (sectionData.title) document.getElementById(`title${type}`).innerText = sectionData.title.toUpperCase();
     document.getElementById(`team1${type}`).innerText = sectionData.team1 || 'HAZAI';
     document.getElementById(`team2${type}`).innerText = sectionData.team2 || 'VENDÉG';
+
+    // Logók frissítése
+    updateLogo(`logo1${type}`, sectionData.logo1);
+    updateLogo(`logo2${type}`, sectionData.logo2);
 
     const tbody = document.getElementById(`body${type}`);
     tbody.innerHTML = '';
