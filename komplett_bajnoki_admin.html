@@ -5,31 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Komplett Bajnoki Admin</title>
 <style>
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
         background-color: #00122e;
         color: #ffff00;
-        margin: 0;
-        padding: 10px;
+        padding: 8px;
         font-family: 'Segoe UI', Arial, sans-serif;
         user-select: none;
-        height: 100vh;
-        overflow: hidden; /* Belefér a 1080p magasságba görgetés nélkül */
     }
     .admin-container {
-        max-width: 1200px;
+        max-width: 1280px;
         margin: 0 auto;
         background: #1e1e1e;
         border: 2px solid #333;
         border-radius: 8px;
-        padding: 12px;
+        padding: 8px 12px;
         color: white;
     }
     .section-title {
         text-align: center;
         color: #ffff00;
-        margin: 0 0 8px 0;
-        font-size: 1.1rem;
+        margin-bottom: 4px;
+        font-size: 1rem;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
@@ -37,10 +34,10 @@
     /* MECCS FEJLÉCEK */
     .match-header-grid {
         display: grid;
-        grid-template-columns: 1fr 200px 1fr;
-        gap: 10px;
+        grid-template-columns: 1fr 220px 1fr;
+        gap: 8px;
         align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     .team-box {
         display: flex;
@@ -51,8 +48,8 @@
         background: #2a2a2a; 
         border: 1px solid #444; 
         color: #ffff00;
-        padding: 6px; 
-        font-size: 0.95rem; 
+        padding: 4px 6px; 
+        font-size: 0.9rem; 
         border-radius: 4px; 
         text-align: center; 
         font-weight: bold;
@@ -62,8 +59,8 @@
         background: #222; 
         border: 1px solid #444; 
         color: #00ff66;
-        padding: 6px; 
-        font-size: 0.8rem; 
+        padding: 4px 6px; 
+        font-size: 0.75rem; 
         border-radius: 4px; 
         text-align: center;
     }
@@ -72,23 +69,23 @@
     .pairs-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 8px;
     }
     .pair-row {
         display: flex;
-        gap: 6px;
+        gap: 4px;
         align-items: center;
         background: #252525;
         border: 1px solid #333;
         border-radius: 4px;
-        padding: 4px 8px;
-        margin-bottom: 4px;
+        padding: 2px 6px;
+        margin-bottom: 3px;
     }
     .pair-num {
         font-weight: bold;
         color: #8b949e;
-        font-size: 0.8rem;
-        width: 20px;
+        font-size: 0.75rem;
+        width: 18px;
         text-align: center;
     }
     .pair-row input[type="text"] {
@@ -96,32 +93,31 @@
         background: #1a1a1a;
         border: 1px solid #444;
         color: white;
-        padding: 4px 6px;
+        padding: 3px 6px;
         border-radius: 4px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
     .sets-inputs {
         display: flex;
-        gap: 3px;
+        gap: 2px;
     }
     .sets-inputs input[type="number"] {
-        width: 34px;
+        width: 32px;
         background: #1a1a1a;
         border: 1px solid #444;
         color: #00ff66;
         text-align: center;
-        padding: 4px 2px;
+        padding: 3px 0;
         font-weight: bold;
         border-radius: 4px;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
 
     .section-divider {
-        height: 3px;
+        height: 2px;
         background: linear-gradient(90deg, #0044aa, #00ff66, #0044aa);
         border-radius: 2px;
-        margin: 10px 0;
-        box-shadow: 0 0 8px rgba(0, 255, 102, 0.4);
+        margin: 6px 0;
     }
 </style>
 
@@ -132,6 +128,7 @@
 
 <div class="admin-container">
     
+    <!-- IFI MECCS SECTION -->
     <div class="section-title">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
     
     <div class="match-header-grid">
@@ -140,8 +137,169 @@
             <input type="text" id="logo1Ifi" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="sendAdminData()">
         </div>
         <div>
-            <input type="text" id="titleIfi" value="IFI BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px; text-align: center; font-size: 0.85rem; border-radius: 4px; font-weight: bold;">
+            <input type="text" id="titleIfi" value="IFI BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 4px; text-align: center; font-size: 0.85rem; border-radius: 4px; font-weight: bold;">
         </div>
         <div class="team-box">
             <input type="text" id="logo2Ifi" class="logo-url" placeholder="Vendég Logó URL" oninput="sendAdminData()">
-            <input type="text" id="team2Ifi" class="team-name" placeholder="Vendég Ifi Csapat"
+            <input type="text" id="team2Ifi" class="team-name" placeholder="Vendég Ifi Csapat" value="Vendég Ifi" oninput="sendAdminData()">
+        </div>
+    </div>
+
+    <div class="pairs-grid">
+        <div id="adminIfiPairsP1"></div>
+        <div id="adminIfiPairsP2"></div>
+    </div>
+
+    <!-- ELVÁLASZTÓ CSÍK -->
+    <div class="section-divider"></div>
+
+    <!-- FELNŐTT MECCS SECTION -->
+    <div class="section-title" style="color: #3fb950;">Felnőtt Bajnoki Mérkőzés (6 fős)</div>
+    
+    <div class="match-header-grid">
+        <div class="team-box">
+            <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()" style="width: 100%;">
+        </div>
+        <div>
+            <input type="text" id="titleAdult" value="FELNŐTT BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 4px; text-align: center; font-size: 0.85rem; border-radius: 4px; font-weight: bold;">
+        </div>
+        <div class="team-box">
+            <input type="text" id="team2Adult" class="team-name" placeholder="Vendég Csapat" value="Vendég" oninput="sendAdminData()" style="width: 100%;">
+        </div>
+    </div>
+
+    <div class="pairs-grid">
+        <div id="adminAdultPairsP1"></div>
+        <div id="adminAdultPairsP2"></div>
+    </div>
+
+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "aizasyd8o7xyctxtjlqcm8z-29xtbopbxrybjom",
+    authDomain: "teke-eredmenyek.firebaseapp.com",
+    databaseURL: "https://teke-eredmenyek-default-rtdb.firebaseio.com",
+    projectId: "teke-eredmenyek",
+    storageBucket: "teke-eredmenyek.appspot.com"
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+function generatePairInputsSideBySide(prefix, count) {
+    const p1Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP1`);
+    const p2Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP2`);
+    
+    p1Container.innerHTML = '';
+    p2Container.innerHTML = '';
+
+    for (let i = 0; i < count; i++) {
+        p1Container.innerHTML += `
+            <div class="pair-row" data-pair="${i}">
+                <span class="pair-num">${i+1}.</span>
+                <input type="text" class="p1-name" placeholder="Hazai Játékos ${i+1}" oninput="sendAdminData()">
+                <div class="sets-inputs">
+                    ${[0,1,2,3].map(s => `<input type="number" class="p1-s${s}" placeholder="S${s+1}" oninput="sendAdminData()">`).join('')}
+                </div>
+            </div>
+        `;
+        p2Container.innerHTML += `
+            <div class="pair-row" data-pair="${i}">
+                <span class="pair-num">${i+1}.</span>
+                <input type="text" class="p2-name" placeholder="Vendég Játékos ${i+1}" oninput="sendAdminData()">
+                <div class="sets-inputs">
+                    ${[0,1,2,3].map(s => `<input type="number" class="p2-s${s}" placeholder="S${s+1}" oninput="sendAdminData()">`).join('')}
+                </div>
+            </div>
+        `;
+    }
+}
+
+function extractPairsData(prefix, count) {
+    const pairs = [];
+    const p1Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP1`);
+    const p2Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP2`);
+    
+    const p1Rows = p1Container.querySelectorAll('.pair-row');
+    const p2Rows = p2Container.querySelectorAll('.pair-row');
+
+    for (let i = 0; i < count; i++) {
+        pairs.push({
+            p1Name: p1Rows[i].querySelector('.p1-name').value,
+            p2Name: p2Rows[i].querySelector('.p2-name').value,
+            p1Sets: [0,1,2,3].map(s => parseInt(p1Rows[i].querySelector(`.p1-s${s}`).value) || 0),
+            p2Sets: [0,1,2,3].map(s => parseInt(p2Rows[i].querySelector(`.p2-s${s}`).value) || 0)
+        });
+    }
+    return pairs;
+}
+
+function sendAdminData() {
+    const sharedLogo1 = document.getElementById('logo1Ifi').value;
+    const sharedLogo2 = document.getElementById('logo2Ifi').value;
+
+    const data = {
+        ifi: {
+            title: document.getElementById('titleIfi').value,
+            team1: document.getElementById('team1Ifi').value,
+            team2: document.getElementById('team2Ifi').value,
+            logo1: sharedLogo1,
+            logo2: sharedLogo2,
+            pairs: extractPairsData('ifi', 2)
+        },
+        adult: {
+            title: document.getElementById('titleAdult').value,
+            team1: document.getElementById('team1Adult').value,
+            team2: document.getElementById('team2Adult').value,
+            logo1: sharedLogo1,
+            logo2: sharedLogo2,
+            pairs: extractPairsData('adult', 6)
+        }
+    };
+
+    db.ref('osszevont_bajnoki_bowling').set(data);
+}
+
+generatePairInputsSideBySide('ifi', 2);
+generatePairInputsSideBySide('adult', 6);
+
+db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+        if (data.ifi) {
+            document.getElementById('titleIfi').value = data.ifi.title || '';
+            document.getElementById('team1Ifi').value = data.ifi.team1 || '';
+            document.getElementById('team2Ifi').value = data.ifi.team2 || '';
+            document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
+            document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
+            populatePairs('ifi', data.ifi.pairs);
+        }
+        if (data.adult) {
+            document.getElementById('titleAdult').value = data.adult.title || '';
+            document.getElementById('team1Adult').value = data.adult.team1 || '';
+            document.getElementById('team2Adult').value = data.adult.team2 || '';
+            populatePairs('adult', data.adult.pairs);
+        }
+    }
+});
+
+function populatePairs(prefix, pairsData) {
+    if (!pairsData || !Array.isArray(pairsData)) return;
+    const p1Rows = document.querySelectorAll(`#admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP1 .pair-row`);
+    const p2Rows = document.querySelectorAll(`#admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP2 .pair-row`);
+    
+    pairsData.forEach((row, idx) => {
+        if (p1Rows[idx] && p2Rows[idx]) {
+            p1Rows[idx].querySelector('.p1-name').value = row.p1Name || '';
+            p2Rows[idx].querySelector('.p2-name').value = row.p2Name || '';
+            row.p1Sets.forEach((val, sIdx) => { p1Rows[idx].querySelector(`.p1-s${sIdx}`).value = val || ''; });
+            row.p2Sets.forEach((val, sIdx) => { p2Rows[idx].querySelector(`.p2-s${sIdx}`).value = val || ''; });
+        }
+    });
+}
+</script>
+</body>
+</html>
