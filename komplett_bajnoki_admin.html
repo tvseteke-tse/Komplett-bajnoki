@@ -118,12 +118,10 @@
     </div>
     <div class="admin-header-inputs">
         <div class="team-input-row">
-            <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()">
-            <input type="text" id="logo1Adult" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="sendAdminData()">
+            <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()" style="width: 100%;">
         </div>
         <div class="team-input-row">
-            <input type="text" id="logo2Adult" class="logo-url" placeholder="Vendég Logó URL" oninput="sendAdminData()">
-            <input type="text" id="team2Adult" class="team-name" placeholder="Vendég Csapat" value="Vendég" oninput="sendAdminData()">
+            <input type="text" id="team2Adult" class="team-name" placeholder="Vendég Csapat" value="Vendég" oninput="sendAdminData()" style="width: 100%;">
         </div>
     </div>
     <div id="adminAdultPairs"></div>
@@ -182,21 +180,24 @@ function extractPairsData(containerId) {
 }
 
 function sendAdminData() {
+    const sharedLogo1 = document.getElementById('logo1Ifi').value;
+    const sharedLogo2 = document.getElementById('logo2Ifi').value;
+
     const data = {
         ifi: {
             title: document.getElementById('titleIfi').value,
             team1: document.getElementById('team1Ifi').value,
             team2: document.getElementById('team2Ifi').value,
-            logo1: document.getElementById('logo1Ifi').value,
-            logo2: document.getElementById('logo2Ifi').value,
+            logo1: sharedLogo1,
+            logo2: sharedLogo2,
             pairs: extractPairsData('adminIfiPairs')
         },
         adult: {
             title: document.getElementById('titleAdult').value,
             team1: document.getElementById('team1Adult').value,
             team2: document.getElementById('team2Adult').value,
-            logo1: document.getElementById('logo1Adult').value,
-            logo2: document.getElementById('logo2Adult').value,
+            logo1: sharedLogo1,
+            logo2: sharedLogo2,
             pairs: extractPairsData('adminAdultPairs')
         }
     };
@@ -222,8 +223,6 @@ db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
             document.getElementById('titleAdult').value = data.adult.title || '';
             document.getElementById('team1Adult').value = data.adult.team1 || '';
             document.getElementById('team2Adult').value = data.adult.team2 || '';
-            document.getElementById('logo1Adult').value = data.adult.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
-            document.getElementById('logo2Adult').value = data.adult.logo2 || '';
             populatePairs('adminAdultPairs', data.adult.pairs);
         }
     }
