@@ -88,17 +88,18 @@
         width: 20px;
         text-align: center;
     }
-    /* Optimális név mező szélesség */
+    /* Játékos név mezők 160px szélességben */
     .pair-row input[type="text"] {
-        width: 140px; 
+        width: 160px; 
+        min-width: 160px;
         background: #1a1a1a;
         border: 1px solid #444;
         color: white;
-        padding: 6px 8px;
+        padding: 5px 8px;
         border-radius: 5px;
         font-size: 0.95rem;
     }
-    /* Jóval nagyobb szett mezők, amik mind beférnek */
+    /* Kisebb, kompaktabb szett mezők */
     .sets-inputs {
         display: flex;
         gap: 4px;
@@ -106,8 +107,8 @@
     }
     .sets-inputs input[type="number"] {
         flex: 1;
-        min-width: 0; /* Megakadályozza a kilógást */
-        height: 40px; 
+        min-width: 0; 
+        height: 34px; 
         background: #1a1a1a;
         border: 1px solid #444;
         color: #00ff66;
@@ -115,7 +116,7 @@
         padding: 2px 0;
         font-weight: bold;
         border-radius: 5px;
-        font-size: 1.2rem;
+        font-size: 1.05rem;
     }
 
     .section-divider {
