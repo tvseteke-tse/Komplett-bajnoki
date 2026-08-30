@@ -9,24 +9,24 @@
     body {
         background-color: #00122e;
         color: #ffff00;
-        padding: 15px;
+        padding: 10px;
         font-family: 'Segoe UI', Arial, sans-serif;
         user-select: none;
     }
     .admin-container {
-        max-width: 1600px; /* Megnövelt szélesség */
+        max-width: 1800px; /* Maximális képernyőkitöltés */
         margin: 0 auto;
         background: #1e1e1e;
         border: 2px solid #333;
         border-radius: 10px;
-        padding: 15px 20px;
+        padding: 12px 18px;
         color: white;
     }
     .section-title {
         text-align: center;
         color: #ffff00;
-        margin-bottom: 8px;
-        font-size: 1.25rem; /* Nagyobb címsor */
+        margin-bottom: 6px;
+        font-size: 1.35rem; 
         text-transform: uppercase;
         letter-spacing: 1px;
     }
@@ -34,22 +34,22 @@
     /* MECCS FEJLÉCEK */
     .match-header-grid {
         display: grid;
-        grid-template-columns: 1fr 280px 1fr;
-        gap: 12px;
+        grid-template-columns: 1fr 300px 1fr;
+        gap: 15px;
         align-items: center;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     .team-box {
         display: flex;
-        gap: 8px;
+        gap: 10px;
     }
     .team-box input.team-name {
         flex: 1.2;
         background: #2a2a2a; 
         border: 1px solid #444; 
         color: #ffff00;
-        padding: 8px 10px; 
-        font-size: 1.05rem; /* Nagyobb betűk */
+        padding: 8px 12px; 
+        font-size: 1.15rem; 
         border-radius: 5px; 
         text-align: center; 
         font-weight: bold;
@@ -60,7 +60,7 @@
         border: 1px solid #444; 
         color: #00ff66;
         padding: 8px 10px; 
-        font-size: 0.85rem; 
+        font-size: 0.9rem; 
         border-radius: 5px; 
         text-align: center;
     }
@@ -69,7 +69,7 @@
     .pairs-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 15px;
+        gap: 18px;
     }
     .pair-row {
         display: flex;
@@ -77,47 +77,51 @@
         align-items: center;
         background: #252525;
         border: 1px solid #333;
-        border-radius: 5px;
-        padding: 5px 10px;
-        margin-bottom: 5px;
+        border-radius: 6px;
+        padding: 4px 10px;
+        margin-bottom: 4px;
     }
     .pair-num {
         font-weight: bold;
         color: #8b949e;
-        font-size: 0.9rem;
-        width: 22px;
+        font-size: 1rem;
+        width: 24px;
         text-align: center;
     }
+    /* Keskenyebb név mező */
     .pair-row input[type="text"] {
-        flex: 1;
+        width: 180px; 
         background: #1a1a1a;
         border: 1px solid #444;
         color: white;
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-size: 0.95rem; /* Kényelmesebben olvasható név mező */
+        padding: 8px 10px;
+        border-radius: 5px;
+        font-size: 1rem;
     }
+    /* Jóval nagyobb szett mezők */
     .sets-inputs {
         display: flex;
-        gap: 4px;
+        gap: 6px;
+        flex: 1;
     }
     .sets-inputs input[type="number"] {
-        width: 42px; /* Tágasabb szett beviteli mezők */
+        flex: 1;
+        height: 42px; /* Magasabb gombok */
         background: #1a1a1a;
         border: 1px solid #444;
         color: #00ff66;
         text-align: center;
-        padding: 6px 0;
+        padding: 2px 0;
         font-weight: bold;
-        border-radius: 4px;
-        font-size: 0.95rem;
+        border-radius: 5px;
+        font-size: 1.25rem; /* Nagyon jól látható nagy számok */
     }
 
     .section-divider {
         height: 3px;
         background: linear-gradient(90deg, #0044aa, #00ff66, #0044aa);
         border-radius: 2px;
-        margin: 12px 0;
+        margin: 10px 0;
     }
 </style>
 
@@ -137,7 +141,7 @@
             <input type="text" id="logo1Ifi" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="sendAdminData()">
         </div>
         <div>
-            <input type="text" id="titleIfi" value="IFI BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 8px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
+            <input type="text" id="titleIfi" value="IFI BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 8px; text-align: center; font-size: 1rem; border-radius: 5px; font-weight: bold;">
         </div>
         <div class="team-box">
             <input type="text" id="logo2Ifi" class="logo-url" placeholder="Vendég Logó URL" oninput="sendAdminData()">
@@ -161,7 +165,7 @@
             <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()" style="width: 100%;">
         </div>
         <div>
-            <input type="text" id="titleAdult" value="FELNŐTT BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 8px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
+            <input type="text" id="titleAdult" value="FELNŐTT BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 8px; text-align: center; font-size: 1rem; border-radius: 5px; font-weight: bold;">
         </div>
         <div class="team-box">
             <input type="text" id="team2Adult" class="team-name" placeholder="Vendég Csapat" value="Vendég" oninput="sendAdminData()" style="width: 100%;">
@@ -252,8 +256,8 @@ function sendAdminData() {
         },
         adult: {
             title: document.getElementById('titleAdult').value,
-            team1: document.getElementById('team1Adult').value,
-            team2: document.getElementById('team2Adult').value,
+            team1: document.getElementById('titleAdult').value ? document.getElementById('team1Adult').value : '',
+            team2: document.getElementById('titleAdult').value ? document.getElementById('team2Adult').value : '',
             logo1: sharedLogo1,
             logo2: sharedLogo2,
             pairs: extractPairsData('adult', 6)
