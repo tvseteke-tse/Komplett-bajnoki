@@ -309,25 +309,33 @@ auth.onAuthStateChanged((user) => {
 });
 
 // BEJELENTKEZÉS
-loginBtn.addEventListener('click', () => {
-    const email = emailInput.value.trim().toLowerCase(); // Levágja a szóközöket és kisbetűsíti
+loginBtn.addEventListener('click', (e) => {
+    e.preventDefault(); // Megakadályozza az esetleges alapértelmezett űrlap-elküldést
+    
+    const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
-    errorDiv.innerText = '';
+    
+    errorDiv.style.color = '#ffff00';
+    errorDiv.innerText = 'Bejelentkezés folyamatban...';
 
-    if(!email || !password) {
+    if (!email || !password) {
+        errorDiv.style.color = '#ff4d4d';
         errorDiv.innerText = 'Kérjük, töltsd ki mindkét mezőt!';
         return;
     }
 
     auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-            emailInput.value = '';
-            passwordInput.value = '';
+        .then((userCredential) => {
+            // Sikeres belépéskor kényszerítjük a nézetváltást
+            errorDiv.innerText = '';
+            authContainer.classList.add('hidden');
+            adminContent.classList.remove('hidden');
+            loadDatabaseData();
         })
         .catch((error) => {
-            console.error("Pontos hiba:", error);
-            // Kiírjuk a pontos Firebase hibakódot is a kijelzőre
-            errorDiv.innerText = `Hiba [${error.code}]: Hibás e-mail cím vagy jelszó!`;
+            console.error("Auth hiba:", error);
+            errorDiv.style.color = '#ff4d4d';
+            errorDiv.innerText = `Hiba (${error.code}): Hibás e-mail vagy jelszó!`;
         });
 });
 
