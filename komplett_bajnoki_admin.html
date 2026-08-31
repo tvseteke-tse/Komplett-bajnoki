@@ -14,10 +14,8 @@
         user-select: none;
     }
 
-    /* SEGÉDOSZTÁLY REJTÉSHEZ */
     .hidden { display: none !important; }
 
-    /* BEJELENTKEZŐ ABLAK STÍLUSAI */
     #auth-container {
         max-width: 360px;
         margin: 60px auto;
@@ -66,7 +64,6 @@
         font-size: 0.9rem;
     }
 
-    /* ADMIN CONTAINER */
     .admin-container {
         max-width: 100%;
         margin: 0 auto;
@@ -106,7 +103,6 @@
         letter-spacing: 1px;
     }
     
-    /* MECCS FEJLÉCEK */
     .match-header-grid {
         display: grid;
         grid-template-columns: 1fr 220px 1fr;
@@ -140,7 +136,6 @@
         text-align: center;
     }
 
-    /* BAL-JOBB OSZLOPOS PÁROSOK */
     .pairs-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -201,14 +196,12 @@
     }
 </style>
 
-<!-- Firebase SDK modulok COMPAT verzióban -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-<!-- 1. BEJELENTKEZŐ ABLAK (Alapértelmezetten ez látszik) -->
 <div id="auth-container">
     <h2>Admin Bejelentkezés</h2>
     <input type="email" id="auth-email" placeholder="E-mail cím" autocomplete="email">
@@ -217,15 +210,12 @@
     <div id="auth-error"></div>
 </div>
 
-<!-- 2. ADMIN CONTAINER (Bejelentkezésig rejtve) -->
 <div id="admin-content" class="admin-container hidden">
-    
     <div class="top-bar">
         <span style="font-size: 0.85rem; color: #8b949e;">Munkamenet: Bejelentkezve</span>
         <button id="auth-logout-btn" class="logout-btn">Kijelentkezés</button>
     </div>
 
-    <!-- IFI MECCS SECTION -->
     <div class="section-title">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
     
     <div class="match-header-grid">
@@ -247,10 +237,8 @@
         <div id="adminIfiPairsP2"></div>
     </div>
 
-    <!-- ELVÁLASZTÓ CSÍK -->
     <div class="section-divider"></div>
 
-    <!-- FELNŐTT MECCS SECTION -->
     <div class="section-title" style="color: #3fb950;">Felnőtt Bajnoki Mérkőzés (6 fős)</div>
     
     <div class="match-header-grid">
@@ -269,12 +257,11 @@
         <div id="adminAdultPairsP1"></div>
         <div id="adminAdultPairsP2"></div>
     </div>
-
 </div>
 
 <script>
 const firebaseConfig = {
-    apiKey: "AIzaSyD8o7xyCtxTJlQcM8z-29XTBOpBXrYbjOM",,
+    apiKey: "aizasyd8o7xyctxtjlqcm8z-29xtbopbxrybjom",
     authDomain: "teke-eredmenyek.firebaseapp.com",
     databaseURL: "https://teke-eredmenyek-default-rtdb.firebaseio.com",
     projectId: "teke-eredmenyek",
@@ -287,7 +274,6 @@ if (!firebase.apps.length) {
 const db = firebase.database();
 const auth = firebase.auth();
 
-// DOM ELEMEK
 const authContainer = document.getElementById('auth-container');
 const adminContent = document.getElementById('admin-content');
 const emailInput = document.getElementById('auth-email');
@@ -296,27 +282,23 @@ const loginBtn = document.getElementById('auth-login-btn');
 const logoutBtn = document.getElementById('auth-logout-btn');
 const errorDiv = document.getElementById('auth-error');
 
-// BEJELENTKEZÉSI ÁLLAPOT FIGYELÉSE
 auth.onAuthStateChanged((user) => {
     if (user) {
         authContainer.classList.add('hidden');
         adminContent.classList.remove('hidden');
-        loadDatabaseData(); // Adatok betöltése belépés után
+        loadDatabaseData();
     } else {
         authContainer.classList.remove('hidden');
         adminContent.classList.add('hidden');
     }
 });
 
-// BEJELENTKEZÉS
 loginBtn.addEventListener('click', (e) => {
-    e.preventDefault(); // Megakadályozza az esetleges alapértelmezett űrlap-elküldést
-    
+    e.preventDefault();
     const email = emailInput.value.trim().toLowerCase();
     const password = passwordInput.value;
-    
     errorDiv.style.color = '#ffff00';
-    errorDiv.innerText = 'Bejelentkezés folyamatban...';
+    errorDiv.innerText = 'Bejelentkezés...';
 
     if (!email || !password) {
         errorDiv.style.color = '#ff4d4d';
@@ -325,12 +307,10 @@ loginBtn.addEventListener('click', (e) => {
     }
 
     auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Sikeres belépéskor kényszerítjük a nézetváltást
+        .then(() => {
             errorDiv.innerText = '';
-            authContainer.classList.add('hidden');
-            adminContent.classList.remove('hidden');
-            loadDatabaseData();
+            emailInput.value = '';
+            passwordInput.value = '';
         })
         .catch((error) => {
             console.error("Auth hiba:", error);
@@ -339,12 +319,10 @@ loginBtn.addEventListener('click', (e) => {
         });
 });
 
-// KIJELENTKEZÉS
 logoutBtn.addEventListener('click', () => {
     auth.signOut();
 });
 
-// PÁROK GENERÁLÁSA
 function generatePairInputsSideBySide(prefix, count) {
     const p1Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP1`);
     const p2Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP2`);
@@ -393,7 +371,6 @@ function extractPairsData(prefix, count) {
     return pairs;
 }
 
-// KÜLDÉS AZ ADATBÁZISBA (Csak akkor engedi a Firebase, ha be van jelentkezve)
 function sendAdminData() {
     if (!auth.currentUser) return;
 
@@ -422,7 +399,6 @@ function sendAdminData() {
     db.ref('osszevont_bajnoki_bowling').set(data);
 }
 
-// INICIALIZÁLÁS
 generatePairInputsSideBySide('ifi', 2);
 generatePairInputsSideBySide('adult', 6);
 
