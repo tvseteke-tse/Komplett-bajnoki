@@ -310,7 +310,7 @@ auth.onAuthStateChanged((user) => {
 
 // BEJELENTKEZÉS
 loginBtn.addEventListener('click', () => {
-    const email = emailInput.value.trim();
+    const email = emailInput.value.trim().toLowerCase(); // Levágja a szóközöket és kisbetűsíti
     const password = passwordInput.value;
     errorDiv.innerText = '';
 
@@ -325,7 +325,9 @@ loginBtn.addEventListener('click', () => {
             passwordInput.value = '';
         })
         .catch((error) => {
-            errorDiv.innerText = 'Hibás e-mail cím vagy jelszó!';
+            console.error("Pontos hiba:", error);
+            // Kiírjuk a pontos Firebase hibakódot is a kijelzőre
+            errorDiv.innerText = `Hiba [${error.code}]: Hibás e-mail cím vagy jelszó!`;
         });
 });
 
