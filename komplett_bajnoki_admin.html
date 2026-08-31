@@ -13,6 +13,60 @@
         font-family: 'Segoe UI', Arial, sans-serif;
         user-select: none;
     }
+
+    /* SEGÉDOSZTÁLY REJTÉSHEZ */
+    .hidden { display: none !important; }
+
+    /* BEJELENTKEZŐ ABLAK STÍLUSAI */
+    #auth-container {
+        max-width: 360px;
+        margin: 60px auto;
+        background: #1e1e1e;
+        border: 2px solid #333;
+        border-radius: 10px;
+        padding: 20px;
+        color: white;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    #auth-container h2 {
+        color: #ffff00;
+        margin-bottom: 15px;
+        font-size: 1.3rem;
+        text-transform: uppercase;
+    }
+    #auth-container input {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        background: #1a1a1a;
+        border: 1px solid #444;
+        color: white;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+    #auth-container button {
+        width: 100%;
+        padding: 10px;
+        margin-top: 12px;
+        background: #00ff66;
+        color: #000;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+    #auth-container button:hover {
+        background: #00cc52;
+    }
+    #auth-error {
+        color: #ff4d4d;
+        margin-top: 10px;
+        font-size: 0.9rem;
+    }
+
+    /* ADMIN CONTAINER */
     .admin-container {
         max-width: 100%;
         margin: 0 auto;
@@ -22,6 +76,27 @@
         padding: 10px 14px;
         color: white;
     }
+    .top-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #333;
+    }
+    .logout-btn {
+        background: #ff3b30;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .logout-btn:hover {
+        background: #d63027;
+    }
+
     .section-title {
         text-align: center;
         color: #ffff00;
@@ -88,7 +163,6 @@
         width: 20px;
         text-align: center;
     }
-    /* Játékos név mezők 160px szélességben */
     .pair-row input[type="text"] {
         width: 200px; 
         min-width: 200px;
@@ -99,7 +173,6 @@
         border-radius: 5px;
         font-size: 0.95rem;
     }
-    /* Kisebb, kompaktabb szett mezők */
     .sets-inputs {
         display: flex;
         gap: 4px;
@@ -128,13 +201,30 @@
     }
 </style>
 
+<!-- Firebase SDK modulok COMPAT verzióban -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body>
 
-<div class="admin-container">
+<!-- 1. BEJELENTKEZŐ ABLAK (Alapértelmezetten ez látszik) -->
+<div id="auth-container">
+    <h2>Admin Bejelentkezés</h2>
+    <input type="email" id="auth-email" placeholder="E-mail cím" autocomplete="email">
+    <input type="password" id="auth-password" placeholder="Jelszó" autocomplete="current-password">
+    <button id="auth-login-btn">Bejelentkezés</button>
+    <div id="auth-error"></div>
+</div>
+
+<!-- 2. ADMIN CONTAINER (Bejelentkezésig rejtve) -->
+<div id="admin-content" class="admin-container hidden">
     
+    <div class="top-bar">
+        <span style="font-size: 0.85rem; color: #8b949e;">Munkamenet: Bejelentkezve</span>
+        <button id="auth-logout-btn" class="logout-btn">Kijelentkezés</button>
+    </div>
+
     <!-- IFI MECCS SECTION -->
     <div class="section-title">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
     
@@ -195,7 +285,56 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 const db = firebase.database();
+const auth = firebase.auth();
 
+// DOM ELEMEK
+const authContainer = document.getElementById('auth-container');
+const adminContent = document.getElementById('admin-content');
+const emailInput = document.getElementById('auth-email');
+const passwordInput = document.getElementById('auth-password');
+const loginBtn = document.getElementById('auth-login-btn');
+const logoutBtn = document.getElementById('auth-logout-btn');
+const errorDiv = document.getElementById('auth-error');
+
+// BEJELENTKEZÉSI ÁLLAPOT FIGYELÉSE
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        authContainer.classList.add('hidden');
+        adminContent.classList.remove('hidden');
+        loadDatabaseData(); // Adatok betöltése belépés után
+    } else {
+        authContainer.classList.remove('hidden');
+        adminContent.classList.add('hidden');
+    }
+});
+
+// BEJELENTKEZÉS
+loginBtn.addEventListener('click', () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+    errorDiv.innerText = '';
+
+    if(!email || !password) {
+        errorDiv.innerText = 'Kérjük, töltsd ki mindkét mezőt!';
+        return;
+    }
+
+    auth.signInWithEmailAndPassword(email, password)
+        .then(() => {
+            emailInput.value = '';
+            passwordInput.value = '';
+        })
+        .catch((error) => {
+            errorDiv.innerText = 'Hibás e-mail cím vagy jelszó!';
+        });
+});
+
+// KIJELENTKEZÉS
+logoutBtn.addEventListener('click', () => {
+    auth.signOut();
+});
+
+// PÁROK GENERÁLÁSA
 function generatePairInputsSideBySide(prefix, count) {
     const p1Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP1`);
     const p2Container = document.getElementById(`admin${prefix.charAt(0).toUpperCase() + prefix.slice(1)}PairsP2`);
@@ -244,7 +383,10 @@ function extractPairsData(prefix, count) {
     return pairs;
 }
 
+// KÜLDÉS AZ ADATBÁZISBA (Csak akkor engedi a Firebase, ha be van jelentkezve)
 function sendAdminData() {
+    if (!auth.currentUser) return;
+
     const sharedLogo1 = document.getElementById('logo1Ifi').value;
     const sharedLogo2 = document.getElementById('logo2Ifi').value;
 
@@ -270,28 +412,31 @@ function sendAdminData() {
     db.ref('osszevont_bajnoki_bowling').set(data);
 }
 
+// INICIALIZÁLÁS
 generatePairInputsSideBySide('ifi', 2);
 generatePairInputsSideBySide('adult', 6);
 
-db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
-    const data = snapshot.val();
-    if (data) {
-        if (data.ifi) {
-            document.getElementById('titleIfi').value = data.ifi.title || '';
-            document.getElementById('team1Ifi').value = data.ifi.team1 || '';
-            document.getElementById('team2Ifi').value = data.ifi.team2 || '';
-            document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
-            document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
-            populatePairs('ifi', data.ifi.pairs);
+function loadDatabaseData() {
+    db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            if (data.ifi) {
+                document.getElementById('titleIfi').value = data.ifi.title || '';
+                document.getElementById('team1Ifi').value = data.ifi.team1 || '';
+                document.getElementById('team2Ifi').value = data.ifi.team2 || '';
+                document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
+                document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
+                populatePairs('ifi', data.ifi.pairs);
+            }
+            if (data.adult) {
+                document.getElementById('titleAdult').value = data.adult.title || '';
+                document.getElementById('team1Adult').value = data.adult.team1 || '';
+                document.getElementById('team2Adult').value = data.adult.team2 || '';
+                populatePairs('adult', data.adult.pairs);
+            }
         }
-        if (data.adult) {
-            document.getElementById('titleAdult').value = data.adult.title || '';
-            document.getElementById('team1Adult').value = data.adult.team1 || '';
-            document.getElementById('team2Adult').value = data.adult.team2 || '';
-            populatePairs('adult', data.adult.pairs);
-        }
-    }
-});
+    });
+}
 
 function populatePairs(prefix, pairsData) {
     if (!pairsData || !Array.isArray(pairsData)) return;
