@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Komplett Bajnoki Kijelző (Reszponzív)</title>
+<title>Komplett Bajnoki Kijelző (Tökéletes Arányok)</title>
 <style>
     * {
         box-sizing: border-box;
@@ -13,7 +13,7 @@
     html, body {
         width: 100vw;
         height: 100vh;
-        overflow: hidden; /* Megakadályozza a görgetést bármilyen kijelzőn */
+        overflow: hidden;
         background-color: #000c1f;
         color: #ffff00;
         font-family: 'Segoe UI', Arial, sans-serif;
@@ -26,39 +26,40 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        gap: 1vh;
+        gap: 0.8vh;
     }
+    
+    /* CONTAINER QUERY HASZNÁLATA AZ ARÁNYOS KIVITELHEZ */
     .match-block {
         background-color: #001c47;
-        border: 0.2vh solid #0044aa;
-        border-radius: 1vh;
-        padding: 1vh 1.5vw;
-        box-shadow: 0 0 1.5vh rgba(0, 50, 150, 0.4);
+        border: 2px solid #0044aa;
+        border-radius: 8px;
+        padding: 0.8vh 1vw;
+        box-shadow: 0 0 15px rgba(0, 50, 150, 0.4);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        overflow: hidden;
+        container-type: size; /* Lehetővé teszi, hogy a belső elemek a blokk magasságát figyeljék */
     }
     
     #blockIfi { flex: 0 0 32%; }
-    #blockAdult { flex: 0 0 64%; }
+    #blockAdult { flex: 0 0 66%; }
 
     /* FORDULÓ / BAJNOKSÁG FEJLÉC */
     .header-container {
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-bottom: 0.5vh;
     }
 
     .tournament-header {
         text-align: center;
-        font-size: clamp(1.2rem, 2.5vh, 2.2rem);
+        font-size: 8cqh; /* Dinamikusan igazodik a blokk magasságához */
         color: #00ff66;
         letter-spacing: 2px;
         text-transform: uppercase;
         font-weight: bold;
-        text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+        text-shadow: 0 0 8px rgba(0, 255, 102, 0.5);
         line-height: 1.1;
     }
 
@@ -66,37 +67,35 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.5vh 1vw;
-        border-bottom: 0.2vh solid #0044aa;
+        padding: 0.2vh 0.5vw;
+        border-bottom: 2px solid #0044aa;
     }
 
-    /* CSAPATNÉV ÉS LOGÓ */
+    /* CSAPATNÉV ÉS LOGÓK */
     .team-box {
         display: flex;
         align-items: center;
         gap: 1vw;
-        font-size: clamp(1.5rem, 4vh, 3.8rem);
+        font-size: 13cqh; /* A blokk magasságához méretezve */
         line-height: 1;
         color: #ffff00;
         font-weight: 900;
         text-transform: uppercase;
-        text-shadow: 0 0 12px rgba(255, 255, 0, 0.5), 0 3px 6px rgba(0,0,0,0.8);
+        text-shadow: 0 0 10px rgba(255, 255, 0, 0.5), 0 2px 4px rgba(0,0,0,0.8);
         letter-spacing: 1px;
     }
     
-    /* DINAMIKUS LOGÓ MÉRETEZÉS */
     .team-logo, .matesz-logo {
-        height: auto;
-        max-height: 8vh; /* Mindig a kijelző magasságához igazodik */
+        height: 18cqh; /* A logó magassága pontosan követi a fejléc arányait */
         width: auto;
         max-width: 12vw;
         object-fit: contain;
         display: inline-block;
-        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
     }
 
     .matesz-logo {
-        filter: drop-shadow(0 0 8px rgba(0, 255, 102, 0.5));
+        filter: drop-shadow(0 0 6px rgba(0, 255, 102, 0.5));
     }
 
     .table-container {
@@ -114,14 +113,14 @@
     }
     .board-table th { 
         color: #ffff00; 
-        font-size: clamp(0.7rem, 1.5vh, 1.1rem); 
-        padding: 0.3vh; 
-        border-bottom: 0.2vh solid #0044aa; 
+        font-size: 5cqh; 
+        padding: 0.2vh; 
+        border-bottom: 2px solid #0044aa; 
     }
     .board-table td { 
-        padding: 0.2vh 0.1vw; 
+        padding: 0.1vh; 
         text-align: center; 
-        font-size: clamp(0.9rem, 2.2vh, 1.6rem); 
+        font-size: 7.5cqh; 
         font-weight: bold; 
         border-bottom: 1px solid #002b66; 
         vertical-align: middle;
@@ -132,7 +131,7 @@
         color: #ffff00; 
         width: 22%; 
         font-family: sans-serif; 
-        font-size: clamp(0.8rem, 1.8vh, 1.4rem); 
+        font-size: 6.5cqh; 
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -144,25 +143,25 @@
     .val-set.lose { color: #ff3333; text-shadow: 0 0 8px rgba(255, 51, 51, 0.5); }
     .val-set.draw { color: #ffff00; text-shadow: 0 0 8px rgba(255, 255, 0, 0.5); }
     
-    .val-sp { color: #ffffff; font-size: clamp(0.8rem, 1.8vh, 1.4rem); }
-    .val-ges { color: #ffffff; font-size: clamp(0.9rem, 2.2vh, 1.6rem); }
+    .val-sp { color: #ffffff; font-size: 6.5cqh; }
+    .val-ges { color: #ffffff; font-size: 7.5cqh; }
     .val-ges.win { color: #00ff66; }
-    .val-mp { color: #ffff00; background-color: #00122e; font-size: clamp(0.8rem, 2vh, 1.5rem); }
-    .divider { border-left: 0.2vh solid #0044aa; border-right: 0.2vh solid #0044aa; }
+    .val-mp { color: #ffff00; background-color: #00122e; font-size: 7cqh; }
+    .divider { border-left: 2px solid #0044aa; border-right: 2px solid #0044aa; }
     
     .footer-score {
-        border-top: 0.2vh solid #0044aa;
-        padding-top: 0.5vh;
+        border-top: 2px solid #0044aa;
+        padding-top: 0.3vh;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: clamp(0.8rem, 1.8vh, 1.3rem);
+        font-size: 6cqh;
         font-family: sans-serif;
         color: #ffffff;
     }
     .footer-team-block { display: flex; gap: 1vw; align-items: center; }
-    .footer-label { color: #8b949e; font-size: clamp(0.7rem, 1.5vh, 1.1rem); }
-    .footer-val { color: #ffff00; font-weight: bold; font-size: clamp(0.9rem, 2vh, 1.5rem); }
+    .footer-label { color: #8b949e; font-size: 5cqh; }
+    .footer-val { color: #ffff00; font-weight: bold; font-size: 6.5cqh; }
     
     .footer-center-group {
         display: flex;
@@ -171,23 +170,23 @@
     }
     .total-ges-big {
         color: #ffff00;
-        font-size: clamp(1.2rem, 3.2vh, 2.6rem);
+        font-size: 11cqh;
         font-weight: bold;
         line-height: 1;
     }
     .total-mp { 
         color: #00ff66; 
-        font-size: clamp(1.2rem, 3.2vh, 2.6rem); 
+        font-size: 11cqh; 
         font-weight: bold; 
         text-shadow: 0 0 10px rgba(0, 255, 102, 0.4); 
         line-height: 1; 
     }
 
     .match-divider {
-        height: 0.6vh;
+        height: 0.5vh;
         background: linear-gradient(90deg, #0044aa, #00ff66, #ffff00, #00ff66, #0044aa);
-        border-radius: 0.3vh;
-        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8);
+        border-radius: 2px;
+        box-shadow: 0 0 10px rgba(0, 255, 102, 0.8);
         flex: 0 0 auto;
     }
 </style>
@@ -199,7 +198,6 @@
 
 <div class="main-board">
 
-    <!-- IFI MECCS BLOKK -->
     <div class="match-block" id="blockIfi">
         <div class="header-container">
             <div class="tournament-header" id="titleIfi">IFI BAJNOKI MÉRKŐZÉS</div>
@@ -248,7 +246,6 @@
 
     <div class="match-divider"></div>
 
-    <!-- FELNŐTT MECCS BLOKK -->
     <div class="match-block" id="blockAdult">
         <div class="header-container">
             <div class="tournament-header" id="titleAdult">FELNŐTT BAJNOKI MÉRKŐZÉS</div>
