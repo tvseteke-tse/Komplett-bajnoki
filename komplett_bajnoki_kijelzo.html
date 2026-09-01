@@ -387,14 +387,18 @@ function renderSection(type, sectionData) {
             totalSp1 += sp1; totalSp2 += sp2;
             totalMp1 += mp1; totalMp2 += mp2;
 
+            // MP alapú színezés meghatározása az Össz. (fa) cellákhoz
+            const ges1Class = (mp1 > mp2) ? 'win' : '';
+            const ges2Class = (mp2 > mp1) ? 'win' : '';
+
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="name-col">${row.p1Name || '-'}</td>
                 ${row.p1Sets.map((s1, i) => `<td class="${getSetClass(s1, row.p2Sets[i])}">${s1 || ''}</td>`).join('')}
                 <td class="val-sp">${sp1}</td>
-                <td class="val-ges ${sum1 > sum2 && sum1 > 0 ? 'win' : ''}">${sum1}</td>
+                <td class="val-ges ${ges1Class}">${sum1}</td>
                 <td class="val-mp divider">${mp1}:${mp2}</td>
-                <td class="val-ges ${sum2 > sum1 && sum2 > 0 ? 'win' : ''}">${sum2}</td>
+                <td class="val-ges ${ges2Class}">${sum2}</td>
                 <td class="val-sp">${sp2}</td>
                 ${row.p2Sets.slice().reverse().map((s2, i) => {
                     const origIdx = 3 - i;
