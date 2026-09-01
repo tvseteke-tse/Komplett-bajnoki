@@ -12,6 +12,7 @@
         padding: 8px;
         font-family: 'Segoe UI', Arial, sans-serif;
         user-select: none;
+        overflow-x: hidden; /* Vízszintes görgetés megelőzése */
     }
 
     .hidden { display: none !important; }
@@ -65,12 +66,13 @@
     }
 
     .admin-container {
+        width: 100%;
         max-width: 100%;
         margin: 0 auto;
         background: #1e1e1e;
         border: 2px solid #333;
         border-radius: 10px;
-        padding: 10px 14px;
+        padding: 10px;
         color: white;
     }
     .top-bar {
@@ -98,106 +100,113 @@
         text-align: center;
         color: #ffff00;
         margin-bottom: 6px;
-        font-size: 1.25rem; 
+        font-size: 1.15rem; 
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     
+    /* MECCS FEJLÉC JAVÍTVA */
     .match-header-grid {
         display: grid;
-        grid-template-columns: 1fr 220px 1fr;
-        gap: 12px;
+        grid-template-columns: 1fr 200px 1fr;
+        gap: 8px;
         align-items: center;
         margin-bottom: 8px;
     }
     .team-box {
         display: flex;
-        gap: 8px;
+        gap: 6px;
+        width: 100%;
     }
     .team-box input.team-name {
-        flex: 1.2;
+        width: 55%;
         background: #2a2a2a; 
         border: 1px solid #444; 
         color: #ffff00;
-        padding: 6px 10px; 
-        font-size: 1.1rem; 
+        padding: 6px 8px; 
+        font-size: 1rem; 
         border-radius: 5px; 
         text-align: center; 
         font-weight: bold;
     }
     .team-box input.logo-url {
-        flex: 1;
+        width: 45%;
         background: #222; 
         border: 1px solid #444; 
         color: #00ff66;
-        padding: 6px 10px; 
-        font-size: 0.85rem; 
+        padding: 6px 8px; 
+        font-size: 0.8rem; 
         border-radius: 5px; 
         text-align: center;
     }
 
-    /* Szinkronizált / letiltott mezők stílusa */
     input:disabled {
         opacity: 0.65;
         cursor: not-allowed;
     }
 
+    /* PÁROSOK RÁCS JAVÍTVA */
     .pairs-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 14px;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 10px;
     }
     .pair-row {
         display: flex;
-        gap: 6px;
+        gap: 4px;
         align-items: center;
         background: #252525;
         border: 1px solid #333;
         border-radius: 6px;
-        padding: 4px 8px;
+        padding: 4px;
         margin-bottom: 4px;
+        width: 100%;
     }
     .pair-num {
         font-weight: bold;
         color: #8b949e;
-        font-size: 0.95rem;
-        width: 20px;
+        font-size: 0.85rem;
+        width: 16px;
         text-align: center;
+        flex-shrink: 0;
     }
+    /* Játékos név mezők pontosan 160px szélesek */
     .pair-row input[type="text"] {
         width: 160px; 
-        min-width: 160px;
+        flex-shrink: 0;
         background: #1a1a1a;
         border: 1px solid #444;
         color: white;
-        padding: 5px 8px;
+        padding: 5px;
         border-radius: 5px;
-        font-size: 0.95rem;
+        font-size: 0.9rem;
     }
+    /* Szett mezők rugalmas kitöltése */
     .sets-inputs {
         display: flex;
-        gap: 4px;
+        gap: 3px;
         flex: 1;
+        min-width: 0;
     }
     .sets-inputs input[type="number"] {
         flex: 1;
         min-width: 0; 
-        height: 34px; 
+        height: 32px; 
         background: #1a1a1a;
         border: 1px solid #444;
         color: #00ff66;
         text-align: center;
-        padding: 2px 0;
+        padding: 0;
         font-weight: bold;
         border-radius: 5px;
-        font-size: 1.05rem;
+        font-size: 0.95rem;
     }
 
     .section-divider {
-        height: 3px;
+        height: 2px;
         background: linear-gradient(90deg, #0044aa, #00ff66, #0044aa);
         border-radius: 2px;
-        margin: 8px 0;
+        margin: 6px 0;
     }
 </style>
 
@@ -223,14 +232,13 @@
 
     <div class="section-title">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
     
-    <!-- ELSŐDLEGES ADATBEVITEL (Csapatnevek, Megnevezés/Forduló, Logók) -->
     <div class="match-header-grid">
         <div class="team-box">
             <input type="text" id="team1Ifi" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="syncAndSendData()">
             <input type="text" id="logo1Ifi" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="syncAndSendData()">
         </div>
         <div>
-            <input type="text" id="titleIfi" value="BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés / Forduló" oninput="syncAndSendData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
+            <input type="text" id="titleIfi" value="BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés / Forduló" oninput="syncAndSendData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px 4px; text-align: center; font-size: 0.85rem; border-radius: 5px; font-weight: bold;">
         </div>
         <div class="team-box">
             <input type="text" id="logo2Ifi" class="logo-url" placeholder="Vendég Logó URL" oninput="syncAndSendData()">
@@ -247,13 +255,12 @@
 
     <div class="section-title" style="color: #3fb950;">Felnőtt Bajnoki Mérkőzés (6 fős)</div>
     
-    <!-- SZINKRONIZÁLT MEZŐK (Automatikus kitöltés, letiltott bevitellel) -->
     <div class="match-header-grid">
         <div class="team-box">
             <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" disabled style="width: 100%;">
         </div>
         <div>
-            <input type="text" id="titleAdult" value="BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" disabled style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
+            <input type="text" id="titleAdult" value="BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" disabled style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px 4px; text-align: center; font-size: 0.85rem; border-radius: 5px; font-weight: bold;">
         </div>
         <div class="team-box">
             <input type="text" id="team2Adult" class="team-name" placeholder="Vendég Csapat" value="Vendég" disabled style="width: 100%;">
@@ -378,7 +385,6 @@ function extractPairsData(prefix, count) {
     return pairs;
 }
 
-// Csapatnevek és bajnokság megnevezés szinkronizálása Ifi-ből a Felnőttbe
 function syncAndSendData() {
     document.getElementById('team1Adult').value = document.getElementById('team1Ifi').value;
     document.getElementById('team2Adult').value = document.getElementById('team2Ifi').value;
@@ -432,7 +438,6 @@ function loadDatabaseData() {
                 document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
                 document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
                 
-                // Szinkronizálás az alsó blokkba is
                 document.getElementById('titleAdult').value = data.ifi.title || '';
                 document.getElementById('team1Adult').value = data.ifi.team1 || '';
                 document.getElementById('team2Adult').value = data.ifi.team2 || '';
