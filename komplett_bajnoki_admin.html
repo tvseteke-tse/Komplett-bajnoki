@@ -136,6 +136,12 @@
         text-align: center;
     }
 
+    /* Szinkronizált / letiltott mezők stílusa */
+    input:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+
     .pairs-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -159,8 +165,8 @@
         text-align: center;
     }
     .pair-row input[type="text"] {
-        width: 200px; 
-        min-width: 200px;
+        width: 160px; 
+        min-width: 160px;
         background: #1a1a1a;
         border: 1px solid #444;
         color: white;
@@ -175,9 +181,8 @@
     }
     .sets-inputs input[type="number"] {
         flex: 1;
-        width: 90px;
         min-width: 0; 
-        height: 30px; 
+        height: 34px; 
         background: #1a1a1a;
         border: 1px solid #444;
         color: #00ff66;
@@ -218,17 +223,18 @@
 
     <div class="section-title">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
     
+    <!-- ELSŐDLEGES ADATBEVITEL (Csapatnevek, Megnevezés/Forduló, Logók) -->
     <div class="match-header-grid">
         <div class="team-box">
-            <input type="text" id="team1Ifi" class="team-name" placeholder="Hazai Ifi Csapat" value="Hazai Ifi" oninput="sendAdminData()">
-            <input type="text" id="logo1Ifi" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="sendAdminData()">
+            <input type="text" id="team1Ifi" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="syncAndSendData()">
+            <input type="text" id="logo1Ifi" class="logo-url" placeholder="Hazai Logó URL" value="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" oninput="syncAndSendData()">
         </div>
         <div>
-            <input type="text" id="titleIfi" value="IFI BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
+            <input type="text" id="titleIfi" value="BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés / Forduló" oninput="syncAndSendData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
         </div>
         <div class="team-box">
-            <input type="text" id="logo2Ifi" class="logo-url" placeholder="Vendég Logó URL" oninput="sendAdminData()">
-            <input type="text" id="team2Ifi" class="team-name" placeholder="Vendég Ifi Csapat" value="Vendég Ifi" oninput="sendAdminData()">
+            <input type="text" id="logo2Ifi" class="logo-url" placeholder="Vendég Logó URL" oninput="syncAndSendData()">
+            <input type="text" id="team2Ifi" class="team-name" placeholder="Vendég Csapat" value="Vendég" oninput="syncAndSendData()">
         </div>
     </div>
 
@@ -241,15 +247,16 @@
 
     <div class="section-title" style="color: #3fb950;">Felnőtt Bajnoki Mérkőzés (6 fős)</div>
     
+    <!-- SZINKRONIZÁLT MEZŐK (Automatikus kitöltés, letiltott bevitellel) -->
     <div class="match-header-grid">
         <div class="team-box">
-            <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" oninput="sendAdminData()" style="width: 100%;">
+            <input type="text" id="team1Adult" class="team-name" placeholder="Hazai Csapat" value="Hazai" disabled style="width: 100%;">
         </div>
         <div>
-            <input type="text" id="titleAdult" value="FELNŐTT BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" oninput="sendAdminData()" style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
+            <input type="text" id="titleAdult" value="BAJNOKI MÉRKŐZÉS" placeholder="Megnevezés" disabled style="width: 100%; background: #2a2a2a; border: 1px solid #444; color: #ffff00; padding: 6px; text-align: center; font-size: 0.95rem; border-radius: 5px; font-weight: bold;">
         </div>
         <div class="team-box">
-            <input type="text" id="team2Adult" class="team-name" placeholder="Vendég Csapat" value="Vendég" oninput="sendAdminData()" style="width: 100%;">
+            <input type="text" id="team2Adult" class="team-name" placeholder="Vendég Csapat" value="Vendég" disabled style="width: 100%;">
         </div>
     </div>
 
@@ -371,25 +378,37 @@ function extractPairsData(prefix, count) {
     return pairs;
 }
 
+// Csapatnevek és bajnokság megnevezés szinkronizálása Ifi-ből a Felnőttbe
+function syncAndSendData() {
+    document.getElementById('team1Adult').value = document.getElementById('team1Ifi').value;
+    document.getElementById('team2Adult').value = document.getElementById('team2Ifi').value;
+    document.getElementById('titleAdult').value = document.getElementById('titleIfi').value;
+    
+    sendAdminData();
+}
+
 function sendAdminData() {
     if (!auth.currentUser) return;
 
+    const sharedTitle = document.getElementById('titleIfi').value;
+    const sharedTeam1 = document.getElementById('team1Ifi').value;
+    const sharedTeam2 = document.getElementById('team2Ifi').value;
     const sharedLogo1 = document.getElementById('logo1Ifi').value;
     const sharedLogo2 = document.getElementById('logo2Ifi').value;
 
     const data = {
         ifi: {
-            title: document.getElementById('titleIfi').value,
-            team1: document.getElementById('team1Ifi').value,
-            team2: document.getElementById('team2Ifi').value,
+            title: sharedTitle,
+            team1: sharedTeam1,
+            team2: sharedTeam2,
             logo1: sharedLogo1,
             logo2: sharedLogo2,
             pairs: extractPairsData('ifi', 2)
         },
         adult: {
-            title: document.getElementById('titleAdult').value,
-            team1: document.getElementById('team1Adult').value,
-            team2: document.getElementById('team2Adult').value,
+            title: sharedTitle,
+            team1: sharedTeam1,
+            team2: sharedTeam2,
             logo1: sharedLogo1,
             logo2: sharedLogo2,
             pairs: extractPairsData('adult', 6)
@@ -412,12 +431,15 @@ function loadDatabaseData() {
                 document.getElementById('team2Ifi').value = data.ifi.team2 || '';
                 document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
                 document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
+                
+                // Szinkronizálás az alsó blokkba is
+                document.getElementById('titleAdult').value = data.ifi.title || '';
+                document.getElementById('team1Adult').value = data.ifi.team1 || '';
+                document.getElementById('team2Adult').value = data.ifi.team2 || '';
+                
                 populatePairs('ifi', data.ifi.pairs);
             }
             if (data.adult) {
-                document.getElementById('titleAdult').value = data.adult.title || '';
-                document.getElementById('team1Adult').value = data.adult.team1 || '';
-                document.getElementById('team2Adult').value = data.adult.team2 || '';
                 populatePairs('adult', data.adult.pairs);
             }
         }
