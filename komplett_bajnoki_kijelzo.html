@@ -156,7 +156,7 @@
     .val-mp { color: #ffff00; background-color: #00122e; }
     .divider { border-left: 1px solid #0044aa; border-right: 1px solid #0044aa; }
     
-    /* LÁBLÉC FIXÁLÁSA */
+    /* LÁBLÉC FIXÁLÁSA & DIFF FORMATÁLÁSA */
     .footer-score {
         flex: 0 0 auto;
         border-top: 1px solid #0044aa;
@@ -168,10 +168,18 @@
         color: #ffffff;
         height: 2.5dvh;
     }
-    .footer-team-block { display: flex; gap: 0.4vw; align-items: center; }
+    .footer-team-block { display: flex; gap: 0.6vw; align-items: center; }
     .footer-label { color: #8b949e; font-size: clamp(0.45rem, 1dvh, 0.8rem); }
     .footer-val { color: #ffff00; font-weight: bold; font-size: clamp(0.55rem, 1.2dvh, 0.95rem); }
     
+    .diff-val {
+        font-weight: bold;
+        font-size: clamp(0.55rem, 1.1dvh, 0.9rem);
+    }
+    .diff-val.plus { color: #00ff66; text-shadow: 0 0 5px rgba(0, 255, 102, 0.4); }
+    .diff-val.minus { color: #ff3333; text-shadow: 0 0 5px rgba(255, 51, 51, 0.4); }
+    .diff-val.zero { color: #ffff00; text-shadow: 0 0 5px rgba(255, 255, 0, 0.4); }
+
     .footer-center-group {
         display: flex;
         align-items: center;
@@ -240,6 +248,7 @@
         <div class="footer-score">
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Ifi">0</span></div>
+                <div><span class="footer-label">Diff:</span> <span class="diff-val zero" id="diff1Ifi">0</span></div>
             </div>
             <div class="footer-center-group">
                 <div class="total-ges-big"><span id="ges1Ifi">0</span> fa</div>
@@ -247,6 +256,7 @@
                 <div class="total-ges-big"><span id="ges2Ifi">0</span> fa</div>
             </div>
             <div class="footer-team-block">
+                <div><span class="footer-label">Diff:</span> <span class="diff-val zero" id="diff2Ifi">0</span></div>
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Ifi">0</span></div>
             </div>
         </div>
@@ -289,6 +299,7 @@
         <div class="footer-score">
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Adult">0</span></div>
+                <div><span class="footer-label">Diff:</span> <span class="diff-val zero" id="diff1Adult">0</span></div>
             </div>
             <div class="footer-center-group">
                 <div class="total-ges-big"><span id="ges1Adult">0</span> fa</div>
@@ -296,6 +307,7 @@
                 <div class="total-ges-big"><span id="ges2Adult">0</span> fa</div>
             </div>
             <div class="footer-team-block">
+                <div><span class="footer-label">Diff:</span> <span class="diff-val zero" id="diff2Adult">0</span></div>
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Adult">0</span></div>
             </div>
         </div>
@@ -433,6 +445,28 @@ function renderSection(type, sectionData) {
     document.getElementById(`ges1${type}`).innerText = totalGes1;
     document.getElementById(`ges2${type}`).innerText = totalGes2;
     document.getElementById(`mp${type}`).innerText = `${totalMp1 + teamBonus1} : ${totalMp2 + teamBonus2}`;
+
+    // Fa különbségek kiszámítása és megjelenítése
+    const diff1El = document.getElementById(`diff1${type}`);
+    const diff2El = document.getElementById(`diff2${type}`);
+    const diff = totalGes1 - totalGes2;
+
+    if (diff > 0) {
+        diff1El.innerText = `+${diff}`;
+        diff1El.className = 'diff-val plus';
+        diff2El.innerText = `-${diff}`;
+        diff2El.className = 'diff-val minus';
+    } else if (diff < 0) {
+        diff1El.innerText = `${diff}`;
+        diff1El.className = 'diff-val minus';
+        diff2El.innerText = `+${Math.abs(diff)}`;
+        diff2El.className = 'diff-val plus';
+    } else {
+        diff1El.innerText = '0';
+        diff1El.className = 'diff-val zero';
+        diff2El.innerText = '0';
+        diff2El.className = 'diff-val zero';
+    }
 }
 </script>
 </body>
