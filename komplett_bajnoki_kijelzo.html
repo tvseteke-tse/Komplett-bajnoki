@@ -219,7 +219,7 @@
             <img class="matesz-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/871712f3931057892c33bbc94359b6dd73762870/MATESZ_logo-removebg-preview.png" alt="MATESZ Logo">
 
             <div class="team-box">
-                <img id="logo2Ifi" class="team-logo" src="" alt="">
+                <img id="logo2Ifi" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/7767f16ffa80fcf1cdcba723498b6a26453fcf2c/let%C3%B6lt%C3%A9s-removebg-preview.png" alt="">
                 <span id="team2Ifi">VENDÉG IFI</span>
             </div>
         </div>
@@ -268,7 +268,7 @@
             <img class="matesz-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/871712f3931057892c33bbc94359b6dd73762870/MATESZ_logo-removebg-preview.png" alt="MATESZ Logo">
 
             <div class="team-box">
-                <img id="logo2Adult" class="team-logo" src="" alt="">
+                <img id="logo2Adult" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/7767f16ffa80fcf1cdcba723498b6a26453fcf2c/let%C3%B6lt%C3%A9s-removebg-preview.png" alt="">
                 <span id="team2Adult">VENDÉG</span>
             </div>
         </div>
@@ -304,7 +304,9 @@
 </div>
 
 <script>
+// Külön alapértelmezett logók a Hazai és Vendég csapatoknak
 const DEFAULT_HAZAI_LOGO = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png";
+const DEFAULT_VENDEG_LOGO = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/7767f16ffa80fcf1cdcba723498b6a26453fcf2c/let%C3%B6lt%C3%A9s-removebg-preview.png";
 
 const firebaseConfig = {
     apiKey: "aizasyd8o7xyctxtjlqcm8z-29xtbopbxrybjom",
@@ -352,8 +354,9 @@ function renderSection(type, sectionData) {
     document.getElementById(`team1${type}`).innerText = sectionData.team1 || 'HAZAI';
     document.getElementById(`team2${type}`).innerText = sectionData.team2 || 'VENDÉG';
 
+    // Külön kezelt fallback logók a Hazai és a Vendég oldalra
     updateLogo(`logo1${type}`, sectionData.logo1, DEFAULT_HAZAI_LOGO);
-    updateLogo(`logo2${type}`, sectionData.logo2);
+    updateLogo(`logo2${type}`, sectionData.logo2, DEFAULT_VENDEG_LOGO);
 
     const tbody = document.getElementById(`body${type}`);
     tbody.innerHTML = '';
