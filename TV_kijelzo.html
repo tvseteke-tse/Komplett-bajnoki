@@ -172,6 +172,9 @@
         font-size: 2.6rem;
         font-weight: bold;
         line-height: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     .total-mp { 
         color: #00ff66; 
@@ -180,6 +183,15 @@
         text-shadow: 0 0 10px rgba(0, 255, 102, 0.4); 
         line-height: 1; 
     }
+
+    /* KÜLÖNBSÉG (DIFF) FORMÁZÁSA */
+    .diff-val {
+        font-size: 1.8rem;
+        font-weight: bold;
+    }
+    .diff-val.plus { color: #00ff66; text-shadow: 0 0 8px rgba(0, 255, 102, 0.5); }
+    .diff-val.minus { color: #ff3333; text-shadow: 0 0 8px rgba(255, 51, 51, 0.5); }
+    .diff-val.zero { color: #ffff00; text-shadow: 0 0 8px rgba(255, 255, 0, 0.5); }
 
     .match-divider {
         height: 6px;
@@ -233,9 +245,15 @@
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Ifi">0</span></div>
             </div>
             <div class="footer-center-group">
-                <div class="total-ges-big"><span id="ges1Ifi">0</span> fa</div>
+                <div class="total-ges-big">
+                    <span class="diff-val zero" id="diff1Ifi">(0)</span>
+                    <span id="ges1Ifi">0</span> fa
+                </div>
                 <div class="total-mp" id="mpIfi">0 : 0</div>
-                <div class="total-ges-big"><span id="ges2Ifi">0</span> fa</div>
+                <div class="total-ges-big">
+                    <span id="ges2Ifi">0</span> fa
+                    <span class="diff-val zero" id="diff2Ifi">(0)</span>
+                </div>
             </div>
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Ifi">0</span></div>
@@ -281,9 +299,15 @@
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp1Adult">0</span></div>
             </div>
             <div class="footer-center-group">
-                <div class="total-ges-big"><span id="ges1Adult">0</span> fa</div>
+                <div class="total-ges-big">
+                    <span class="diff-val zero" id="diff1Adult">(0)</span>
+                    <span id="ges1Adult">0</span> fa
+                </div>
                 <div class="total-mp" id="mpAdult">0 : 0</div>
-                <div class="total-ges-big"><span id="ges2Adult">0</span> fa</div>
+                <div class="total-ges-big">
+                    <span id="ges2Adult">0</span> fa
+                    <span class="diff-val zero" id="diff2Adult">(0)</span>
+                </div>
             </div>
             <div class="footer-team-block">
                 <div><span class="footer-label">SP:</span> <span class="footer-val" id="sp2Adult">0</span></div>
@@ -407,6 +431,28 @@ function renderSection(type, sectionData) {
     document.getElementById(`ges1${type}`).innerText = totalGes1;
     document.getElementById(`ges2${type}`).innerText = totalGes2;
     document.getElementById(`mp${type}`).innerText = `${totalMp1 + teamBonus1} : ${totalMp2 + teamBonus2}`;
+
+    // Fa különbségek frissítése
+    const diff1El = document.getElementById(`diff1${type}`);
+    const diff2El = document.getElementById(`diff2${type}`);
+    const diff = totalGes1 - totalGes2;
+
+    if (diff > 0) {
+        diff1El.innerText = `(+${diff})`;
+        diff1El.className = 'diff-val plus';
+        diff2El.innerText = `(-${diff})`;
+        diff2El.className = 'diff-val minus';
+    } else if (diff < 0) {
+        diff1El.innerText = `(${diff})`;
+        diff1El.className = 'diff-val minus';
+        diff2El.innerText = `(+${Math.abs(diff)})`;
+        diff2El.className = 'diff-val plus';
+    } else {
+        diff1El.innerText = '(0)';
+        diff1El.className = 'diff-val zero';
+        diff2El.innerText = '(0)';
+        diff2El.className = 'diff-val zero';
+    }
 }
 </script>
 </body>
