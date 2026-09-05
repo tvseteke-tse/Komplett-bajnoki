@@ -255,8 +255,8 @@
             </div>
             <div class="footer-center-group">
                 <div class="total-ges-big">
-                    <span id="ges1Ifi">0</span> fa
                     <span class="diff-val zero" id="diff1Ifi">(0)</span>
+                    <span id="ges1Ifi">0</span> fa
                 </div>
                 <div class="total-mp" id="mpIfi">0 : 0</div>
                 <div class="total-ges-big">
@@ -310,8 +310,8 @@
             </div>
             <div class="footer-center-group">
                 <div class="total-ges-big">
-                    <span id="ges1Adult">0</span> fa
                     <span class="diff-val zero" id="diff1Adult">(0)</span>
+                    <span id="ges1Adult">0</span> fa
                 </div>
                 <div class="total-mp" id="mpAdult">0 : 0</div>
                 <div class="total-ges-big">
@@ -458,7 +458,7 @@ function renderSection(type, sectionData) {
     document.getElementById(`ges2${type}`).innerText = totalGes2;
     document.getElementById(`mp${type}`).innerText = `${totalMp1 + teamBonus1} : ${totalMp2 + teamBonus2}`;
 
-    // Különbség kiszámítása a fa mellett
+    // Különbség kiszámítása
     const diff1El = document.getElementById(`diff1${type}`);
     const diff2El = document.getElementById(`diff2${type}`);
     const diff = totalGes1 - totalGes2;
