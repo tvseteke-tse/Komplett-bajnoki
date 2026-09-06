@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OBS Ifi Kijelző</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 12, 31, 0.95);
+        color: #ffffff;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        overflow: hidden;
+        user-select: none;
+        display: flex;
+        align-items: flex-end;
+    }
+    
+    .stream-overlay {
+        width: 100%;
+        background: #000a17;
+        border-top: 2px solid #0044aa;
+        box-shadow: 0 -4px 15px rgba(0,0,0,0.8);
+        padding: 4px 10px;
+    }
+
+    .tournament-title {
+        text-align: center;
+        font-size: 0.75rem;
+        color: #00ff66;
+        font-weight: bold;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+    }
+
+    .board-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.85rem;
+    }
+
+    .board-table th { 
+        color: #8b949e; 
+        border-bottom: 1px solid #002b66;
+        font-size: 0.7rem;
+        padding: 2px 0;
+        font-family: sans-serif;
+    }
+    
+    .board-table td { 
+        text-align: center; 
+        font-weight: bold; 
+        border-bottom: 1px solid rgba(0, 68, 170, 0.3); 
+        padding: 3px 0;
+    }
+
+    .name-col { 
+        text-align: left !important; 
+        color: #ffffff; 
+        width: 20%; 
+        font-family: sans-serif; 
+        font-size: 0.8rem !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .name-col.right { text-align: right !important; }
+    
+    .val-set { color: #aaaaaa; }
+    .val-set.win { color: #00ff66; text-shadow: 0 0 5px rgba(0, 255, 102, 0.5); }
+    .val-set.lose { color: #ff4444; }
+    .val-set.draw { color: #ffff00; }
+    
+    .val-sp { color: #ffffff; }
+    .val-ges { color: #ffffff; }
+    .val-ges.win { color: #00ff66; text-shadow: 0 0 6px rgba(0, 255, 102, 0.5); }
+    .val-ges.draw { color: #ffff00; }
+    .val-mp { color: #ffff00; background-color: #00122e; }
+    .divider { border-left: 1px solid #0044aa; border-right: 1px solid #0044aa; }
+
+    /* LÁBLÉC / EREDMÉNY SÁV */
+    .footer-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #001433;
+        margin-top: 4px;
+        padding: 4px 12px;
+        border-radius: 4px;
+        border: 1px solid #003388;
+    }
+    .team-info { display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 0.9rem; color: #ffff00; }
+    .team-logo { height: 22px; width: auto; object-fit: contain; }
+    
+    .score-center { display: flex; align-items: center; gap: 15px; }
+    .ges-total { font-size: 0.95rem; font-weight: bold; color: #ffffff; display: flex; align-items: center; gap: 5px; }
+    .main-score { font-size: 1.4rem; font-weight: bold; color: #00ff66; text-shadow: 0 0 8px rgba(0, 255, 102, 0.6); }
+
+    .diff-val { font-size: 0.75rem; font-weight: bold; }
+    .diff-val.plus { color: #00ff66; }
+    .diff-val.minus { color: #ff4444; }
+    .diff-val.zero { color: #ffff00; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="stream-overlay">
+    <div class="tournament-title" id="titleIfi">IFI BAJNOKI MÉRKŐZÉS</div>
+    
+    <table class="board-table">
+        <thead>
+            <tr>
+                <th class="name-col">Név</th>
+                <th>1</th><th>2</th><th>3</th><th>4</th><th>SP</th>
+                <th>Össz.</th><th>MP</th><th>Össz.</th><th>SP</th>
+                <th>4</th><th>3</th><th>2</th><th>1</th>
+                <th class="name-col right">Név</th>
+            </tr>
+        </thead>
+        <tbody id="bodyIfi"></tbody>
+    </table>
+
+    <div class="footer-bar">
+        <div class="team-info">
+            <img id="logo1Ifi" class="team-logo" src="" alt="">
+            <span id="team1Ifi">HAZAI IFI</span>
+        </div>
+        
+        <div class="score-center">
+            <div class="ges-total">
+                <span class="diff-val zero" id="diff1Ifi">(0)</span>
+                <span id="ges1Ifi">0</span> fa
+            </div>
+            <div class="main-score" id="mpIfi">0 : 0</div>
+            <div class="ges-total">
+                <span id="ges2Ifi">0</span> fa
+                <span class="diff-val zero" id="diff2Ifi">(0)</span>
+            </div>
+        </div>
+
+        <div class="team-info">
+            <span id="team2Ifi">VENDÉG IFI</span>
+            <img id="logo2Ifi" class="team-logo" src="" alt="">
+        </div>
+    </div>
+</div>
+
+<script>
+const DEFAULT_HAZAI_LOGO = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png";
+const DEFAULT_VENDEG_LOGO = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/7767f16ffa80fcf1cdcba723498b6a26453fcf2c/let%C3%B6lt%C3%A9s-removebg-preview.png";
+
+const firebaseConfig = {
+    apiKey: "aizasyd8o7xyctxtjlqcm8z-29xtbopbxrybjom",
+    authDomain: "teke-eredmenyek.firebaseapp.com",
+    databaseURL: "https://teke-eredmenyek-default-rtdb.firebaseio.com",
+    projectId: "teke-eredmenyek",
+    storageBucket: "teke-eredmenyek.appspot.com"
+};
+
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+db.ref('osszevont_bajnoki_bowling/ifi').on('value', (snapshot) => {
+    const data = snapshot.val();
+    if (data) renderSection(data);
+});
+
+function getSetClass(val1, val2) {
+    if (val1 === 0 && val2 === 0) return 'val-set';
+    if (val1 > val2) return 'val-set win';
+    if (val1 < val2) return 'val-set lose';
+    return 'val-set draw';
+}
+
+function updateLogo(elementId, logoUrl, fallbackUrl) {
+    const imgEl = document.getElementById(elementId);
+    const targetUrl = (logoUrl && logoUrl.trim() !== '') ? logoUrl : fallbackUrl;
+    imgEl.src = targetUrl;
+}
+
+function renderSection(sectionData) {
+    if (sectionData.title) document.getElementById('titleIfi').innerText = sectionData.title.toUpperCase();
+    document.getElementById('team1Ifi').innerText = sectionData.team1 || 'HAZAI';
+    document.getElementById('team2Ifi').innerText = sectionData.team2 || 'VENDÉG';
+
+    updateLogo('logo1Ifi', sectionData.logo1, DEFAULT_HAZAI_LOGO);
+    updateLogo('logo2Ifi', sectionData.logo2, DEFAULT_VENDEG_LOGO);
+
+    const tbody = document.getElementById('bodyIfi');
+    tbody.innerHTML = '';
+
+    let totalGes1 = 0, totalGes2 = 0;
+    let totalSp1 = 0, totalSp2 = 0;
+    let totalMp1 = 0, totalMp2 = 0;
+
+    if (sectionData.pairs && Array.isArray(sectionData.pairs)) {
+        sectionData.pairs.forEach(row => {
+            const sum1 = row.p1Sets.reduce((a, b) => a + b, 0);
+            const sum2 = row.p2Sets.reduce((a, b) => a + b, 0);
+
+            let sp1 = 0, sp2 = 0;
+            row.p1Sets.forEach((s1, idx) => {
+                const s2 = row.p2Sets[idx];
+                if (s1 > s2) sp1 += 1;
+                else if (s2 > s1) sp2 += 1;
+                else if (s1 > 0 || s2 > 0) { sp1 += 0.5; sp2 += 0.5; }
+            });
+
+            let mp1 = 0, mp2 = 0;
+            if (sum1 > 0 || sum2 > 0) {
+                if (sp1 > sp2) mp1 = 1;
+                else if (sp2 > sp1) mp2 = 1;
+                else if (sum1 > sum2) mp1 = 1;
+                else if (sum2 > sum1) mp2 = 1;
+                else { mp1 = 0.5; mp2 = 0.5; }
+            }
+
+            totalGes1 += sum1; totalGes2 += sum2;
+            totalSp1 += sp1; totalSp2 += sp2;
+            totalMp1 += mp1; totalMp2 += mp2;
+
+            let ges1Class = '', ges2Class = '';
+            if (sum1 > 0 || sum2 > 0) {
+                if (mp1 > mp2) ges1Class = 'win';
+                else if (mp2 > mp1) ges2Class = 'win';
+                else { ges1Class = 'draw'; ges2Class = 'draw'; }
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="name-col">${row.p1Name || '-'}</td>
+                ${row.p1Sets.map((s1, i) => `<td class="${getSetClass(s1, row.p2Sets[i])}">${s1 || ''}</td>`).join('')}
+                <td class="val-sp">${sp1}</td>
+                <td class="val-ges ${ges1Class}">${sum1}</td>
+                <td class="val-mp divider">${mp1}:${mp2}</td>
+                <td class="val-ges ${ges2Class}">${sum2}</td>
+                <td class="val-sp">${sp2}</td>
+                ${row.p2Sets.slice().reverse().map((s2, i) => {
+                    const origIdx = 3 - i;
+                    return `<td class="${getSetClass(s2, row.p1Sets[origIdx])}">${s2 || ''}</td>`;
+                }).join('')}
+                <td class="name-col right">${row.p2Name || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    let teamBonus1 = 0, teamBonus2 = 0;
+    if (totalGes1 > totalGes2) teamBonus1 = 2;
+    else if (totalGes2 > totalGes1) teamBonus2 = 2;
+    else if (totalGes1 > 0 || totalGes2 > 0) { teamBonus1 = 1; teamBonus2 = 1; }
+
+    document.getElementById('ges1Ifi').innerText = totalGes1;
+    document.getElementById('ges2Ifi').innerText = totalGes2;
+    document.getElementById('mpIfi').innerText = `${totalMp1 + teamBonus1} : ${totalMp2 + teamBonus2}`;
+
+    const diff1El = document.getElementById('diff1Ifi');
+    const diff2El = document.getElementById('diff2Ifi');
+    const diff = totalGes1 - totalGes2;
+
+    if (diff > 0) {
+        diff1El.innerText = `(+${diff})`; diff1El.className = 'diff-val plus';
+        diff2El.innerText = `(-${diff})`; diff2El.className = 'diff-val minus';
+    } else if (diff < 0) {
+        diff1El.innerText = `(${diff})`; diff1El.className = 'diff-val minus';
+        diff2El.innerText = `(+${Math.abs(diff)})`; diff2El.className = 'diff-val plus';
+    } else {
+        diff1El.innerText = '(0)'; diff1El.className = 'diff-val zero';
+        diff2El.innerText = '(0)'; diff2El.className = 'diff-val zero';
+    }
+}
+</script>
+</body>
+</html>
