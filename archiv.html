@@ -63,6 +63,37 @@
         border-color: #00ff66;
     }
 
+    /* JELMAGYARÁZAT BARS */
+    .legend-bar {
+        background: #001838;
+        border: 1px solid #0044aa;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        font-size: 0.85rem;
+        color: #ffffff;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .legend-tag {
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    .tag-s { background: #000; color: #00ff66; border: 1px solid #0044aa; }
+    .tag-of { background: #002244; color: #ffff00; border: 1px solid #0066cc; }
+    .tag-mp { background: #0044aa; color: #ffffff; }
+
     /* KINÉZET: KIJELZŐ STÍLUS */
     .board-container {
         background: #000a1a;
@@ -136,7 +167,23 @@
         gap: 10px;
     }
 
-    /* HAZAI CSAPAT SORA (Alapértelmezett sorrend) */
+    /* OSZLOPFEJLÉCEK */
+    .column-headers-p1, .column-headers-p2 {
+        display: flex;
+        align-items: center;
+        padding: 2px 8px;
+        margin-bottom: 2px;
+        gap: 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #88aacc;
+    }
+
+    .column-headers-p2 {
+        flex-direction: row-reverse;
+    }
+
+    /* HAZAI CSAPAT SORA */
     .pair-row-p1 {
         display: flex;
         align-items: center;
@@ -179,7 +226,7 @@
         text-overflow: ellipsis;
     }
     
-    .pair-row-p2 .player-name {
+    .pair-row-p2 .player-name, .column-headers-p2 .player-name-hdr {
         text-align: right;
     }
 
@@ -188,7 +235,7 @@
         gap: 3px;
     }
 
-    .set-cell {
+    .set-cell, .set-hdr {
         width: 32px;
         height: 28px;
         background: #000;
@@ -202,7 +249,15 @@
         border-radius: 4px;
     }
 
-    .total-cell {
+    .set-hdr {
+        height: auto;
+        background: transparent;
+        border: none;
+        color: #00ff66;
+        font-size: 0.75rem;
+    }
+
+    .total-cell, .total-hdr {
         min-width: 45px;
         height: 28px;
         background: #002244;
@@ -217,7 +272,15 @@
         padding: 0 4px;
     }
 
-    .point-cell {
+    .total-hdr {
+        height: auto;
+        background: transparent;
+        border: none;
+        color: #ffff00;
+        font-size: 0.75rem;
+    }
+
+    .point-cell, .point-hdr {
         width: 30px;
         height: 28px;
         background: #0044aa;
@@ -228,6 +291,14 @@
         font-weight: bold;
         font-size: 0.95rem;
         border-radius: 4px;
+    }
+
+    .point-hdr {
+        height: auto;
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        font-size: 0.75rem;
     }
 
     /* ÖSSZESÍTŐ SÁV */
@@ -245,7 +316,7 @@
     }
 
     .sum-team-pins {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         font-weight: bold;
         color: #00ff66;
     }
@@ -284,6 +355,7 @@
 <body>
 
 <div class="container">
+    <!-- VEZÉRLŐ SÁV -->
     <div class="top-controls">
         <div class="control-group">
             <label for="archiveSelect">MÉRKŐZÉS VÁLASZTÁS:</label>
@@ -297,6 +369,14 @@
         </div>
     </div>
 
+    <!-- JELMAGYARÁZAT -->
+    <div class="legend-bar">
+        <div class="legend-item"><span class="legend-tag tag-s">S1 - S4</span> Szett eredmények (fa)</div>
+        <div class="legend-item"><span class="legend-tag tag-of">ÖF</span> Összesített fa (egyéni)</div>
+        <div class="legend-item"><span class="legend-tag tag-mp">MP</span> Egyéni Mérkőzéspont (1 pont / 0.5 pont)</div>
+    </div>
+
+    <!-- KIJELZŐ MEGJELENÍTÉSE -->
     <div id="boardDisplay" class="hidden">
 
         <!-- IFJÚSÁGI KIJELZŐ TÁBLA -->
@@ -316,8 +396,39 @@
             </div>
 
             <div class="pairs-grid">
-                <div id="ifiP1Container"></div>
-                <div id="ifiP2Container"></div>
+                <div>
+                    <!-- Hazai Oszlopfejlécek -->
+                    <div class="column-headers-p1">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name" style="color:#88aacc;">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S1</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S4</span>
+                        </div>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="ifiP1Container"></div>
+                </div>
+
+                <div>
+                    <!-- Vendég Oszlopfejlécek -->
+                    <div class="column-headers-p2">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name player-name-hdr" style="color:#88aacc;">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S4</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S1</span>
+                        </div>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="ifiP2Container"></div>
+                </div>
             </div>
 
             <div id="ifiSummary" class="summary-bar"></div>
@@ -340,8 +451,39 @@
             </div>
 
             <div class="pairs-grid">
-                <div id="adultP1Container"></div>
-                <div id="adultP2Container"></div>
+                <div>
+                    <!-- Hazai Oszlopfejlécek -->
+                    <div class="column-headers-p1">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name" style="color:#88aacc;">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S1</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S4</span>
+                        </div>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="adultP1Container"></div>
+                </div>
+
+                <div>
+                    <!-- Vendég Oszlopfejlécek -->
+                    <div class="column-headers-p2">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name player-name-hdr" style="color:#88aacc;">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S4</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S1</span>
+                        </div>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="adultP2Container"></div>
+                </div>
             </div>
 
             <div id="adultSummary" class="summary-bar"></div>
@@ -480,7 +622,6 @@ function renderCategoryDisplay(prefix, pairs, count) {
         const p2Sets = pair.p2Sets || [0,0,0,0];
 
         // Vendég oldalon a tömb megfordítása: [S4, S3, S2, S1]
-        // Mivel a flex-direction: row-reverse miatt az utolsó HTML elem kerül balra (középre), így az S1 marad a tábla közepén.
         const p2SetsReversed = [...p2Sets].reverse();
 
         const p1Sum = p1Sets.reduce((a, b) => a + Number(b), 0);
@@ -520,7 +661,7 @@ function renderCategoryDisplay(prefix, pairs, count) {
             </div>
         `;
 
-        // Vendég sor (Tükrözve: S4 -> S1 tömbsorrend, így vizuálisan az S1 van középen)
+        // Vendég sor (Tükrözve)
         p2Container.innerHTML += `
             <div class="pair-row-p2">
                 <span class="pair-num">${i+1}.</span>
@@ -529,7 +670,7 @@ function renderCategoryDisplay(prefix, pairs, count) {
                     ${p2SetsReversed.map(s => `<div class="set-cell">${s || 0}</div>`).join('')}
                 </div>
                 <div class="total-cell">${p2Sum}</div>
-                <div class="point-cell">${p2Pts}</div>
+                <div class="point-cell">${p1Pts === 1 ? 0 : (p2Pts)}</div>
             </div>
         `;
     }
