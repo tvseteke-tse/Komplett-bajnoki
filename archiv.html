@@ -15,7 +15,7 @@
     }
 
     .container {
-        max-width: 1200px;
+        max-width: 1250px;
         margin: 0 auto;
     }
 
@@ -93,6 +93,7 @@
     .tag-win { background: #006622; color: #00ff66; border: 1px solid #00cc44; }
     .tag-loss { background: #660000; color: #ff4d4d; border: 1px solid #cc0000; }
     .tag-draw { background: #554400; color: #ffff00; border: 1px solid #cca300; }
+    .tag-sp { background: #002244; color: #00aaff; border: 1px solid #0066cc; }
     .tag-mp { background: #0044aa; color: #ffffff; }
 
     /* KINÉZET: KIJELZŐ STÍLUS */
@@ -237,7 +238,7 @@
     }
 
     /* SZETT ÉS ÖSSZFA CELLÁK BASE */
-    .set-cell, .set-hdr, .total-cell, .total-hdr {
+    .set-cell, .set-hdr, .total-cell, .total-hdr, .sp-cell, .sp-hdr {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -260,6 +261,23 @@
         background: transparent;
         border: none;
         color: #88aacc;
+        font-size: 0.75rem;
+    }
+
+    .sp-cell {
+        width: 30px;
+        height: 28px;
+        background: #001838;
+        border: 1px solid #0044aa;
+        color: #00aaff;
+        font-size: 0.9rem;
+    }
+
+    .sp-hdr {
+        width: 30px;
+        background: transparent;
+        border: none;
+        color: #00aaff;
         font-size: 0.75rem;
     }
 
@@ -394,6 +412,7 @@
         <div class="legend-item"><span class="legend-tag tag-win">Zöld</span> Több fa / Nyert szett</div>
         <div class="legend-item"><span class="legend-tag tag-loss">Piros</span> Kevesebb fa / Veszített szett</div>
         <div class="legend-item"><span class="legend-tag tag-draw">Sárga</span> Egyenlő fa / Döntetlen szett</div>
+        <div class="legend-item"><span class="legend-tag tag-sp">SP</span> Szettpontok összege</div>
         <div class="legend-item"><span class="legend-tag tag-mp">MP</span> Egyéni Mérkőzéspont</div>
     </div>
 
@@ -428,6 +447,7 @@
                             <span class="set-hdr">S3</span>
                             <span class="set-hdr">S4</span>
                         </div>
+                        <span class="sp-hdr">SP</span>
                         <span class="total-hdr">ÖF</span>
                         <span class="point-hdr">MP</span>
                     </div>
@@ -445,6 +465,7 @@
                             <span class="set-hdr">S2</span>
                             <span class="set-hdr">S1</span>
                         </div>
+                        <span class="sp-hdr">SP</span>
                         <span class="total-hdr">ÖF</span>
                         <span class="point-hdr">MP</span>
                     </div>
@@ -483,6 +504,7 @@
                             <span class="set-hdr">S3</span>
                             <span class="set-hdr">S4</span>
                         </div>
+                        <span class="sp-hdr">SP</span>
                         <span class="total-hdr">ÖF</span>
                         <span class="point-hdr">MP</span>
                     </div>
@@ -500,6 +522,7 @@
                             <span class="set-hdr">S2</span>
                             <span class="set-hdr">S1</span>
                         </div>
+                        <span class="sp-hdr">SP</span>
                         <span class="total-hdr">ÖF</span>
                         <span class="point-hdr">MP</span>
                     </div>
@@ -590,7 +613,7 @@ function renderSelectedMatch() {
 
     const data = allMatches[selectedId];
     boardDisplay.classList.remove('hidden');
-    noMatchMsg.classList.add('hidden');
+    noMatchMsg.add('hidden');
 
     if (data.ifi) {
         document.getElementById('ifiTitle').innerText = data.ifi.title || 'BAJNOKI MÉRKŐZÉS';
@@ -675,7 +698,6 @@ function renderCategoryDisplay(prefix, pairs, count) {
             else if (v1 > 0) { p1SetPoints += 0.5; p2SetPoints += 0.5; }
 
             const clsP1 = getCompareClass(v1, v2);
-            const clsP2 = getCompareClass(v2, v1);
 
             p1SetsHtml += `<div class="set-cell ${clsP1}">${v1}</div>`;
         }
@@ -703,7 +725,7 @@ function renderCategoryDisplay(prefix, pairs, count) {
         const totalClsP1 = getCompareClass(p1Sum, p2Sum);
         const totalClsP2 = getCompareClass(p2Sum, p1Sum);
 
-        // Hazai sor (S1 -> S4)
+        // Hazai sor (S1 -> S4 | SP | ÖF | MP)
         p1Container.innerHTML += `
             <div class="pair-row-p1">
                 <span class="pair-num">${i+1}.</span>
@@ -711,12 +733,13 @@ function renderCategoryDisplay(prefix, pairs, count) {
                 <div class="sets-box">
                     ${p1SetsHtml}
                 </div>
+                <div class="sp-cell">${p1SetPoints}</div>
                 <div class="total-cell ${totalClsP1}">${p1Sum}</div>
                 <div class="point-cell">${p1Pts}</div>
             </div>
         `;
 
-        // Vendég sor (Tükrözve S4 -> S1)
+        // Vendég sor (Tükrözve S4 -> S1 | SP | ÖF | MP)
         p2Container.innerHTML += `
             <div class="pair-row-p2">
                 <span class="pair-num">${i+1}.</span>
@@ -724,6 +747,7 @@ function renderCategoryDisplay(prefix, pairs, count) {
                 <div class="sets-box">
                     ${p2SetsHtmlReversed}
                 </div>
+                <div class="sp-cell">${p2SetPoints}</div>
                 <div class="total-cell ${totalClsP2}">${p2Sum}</div>
                 <div class="point-cell">${p2Pts}</div>
             </div>
