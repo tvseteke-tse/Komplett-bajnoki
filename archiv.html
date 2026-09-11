@@ -1,3 +1,545 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mérkőzés Archívum - Kijelző Nézet</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        background-color: #00122e;
+        color: #ffff00;
+        padding: 10px;
+        font-family: 'Segoe UI', Arial, sans-serif;
+        user-select: none;
+    }
+
+    .container {
+        max-width: 1250px;
+        margin: 0 auto;
+    }
+
+    /* FEJLÉC ÉS KERESŐ SÁV */
+    .top-controls {
+        background: #1e1e1e;
+        border: 2px solid #333;
+        border-radius: 8px;
+        padding: 10px 15px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .control-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex: 1;
+        min-width: 260px;
+    }
+
+    .control-group label {
+        color: #ffff00;
+        font-size: 0.9rem;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    select, input[type="text"] {
+        width: 100%;
+        padding: 8px 10px;
+        background: #111;
+        border: 1px solid #444;
+        color: #00ff66;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        outline: none;
+    }
+
+    select:focus, input[type="text"]:focus {
+        border-color: #00ff66;
+    }
+
+    /* JELMAGYARÁZAT BARS */
+    .legend-bar {
+        background: #001838;
+        border: 1px solid #0044aa;
+        border-radius: 6px;
+        padding: 8px 12px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        justify-content: center;
+        font-size: 0.85rem;
+        color: #ffffff;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .legend-tag {
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+    .tag-win { background: #006622; color: #00ff66; border: 1px solid #00cc44; }
+    .tag-loss { background: #660000; color: #ff4d4d; border: 1px solid #cc0000; }
+    .tag-draw { background: #554400; color: #ffff00; border: 1px solid #cca300; }
+    .tag-sp { background: #002244; color: #00aaff; border: 1px solid #0066cc; }
+    .tag-mp { background: #0044aa; color: #ffffff; }
+
+    /* KINÉZET: KIJELZŐ STÍLUS */
+    .board-container {
+        background: #000a1a;
+        border: 3px solid #0044aa;
+        border-radius: 12px;
+        padding: 12px;
+        box-shadow: 0 0 25px rgba(0, 68, 170, 0.4);
+        margin-bottom: 25px;
+    }
+
+    .section-banner {
+        text-align: center;
+        background: linear-gradient(90deg, #001f4d, #0044aa, #001f4d);
+        color: #ffff00;
+        font-size: 1.2rem;
+        font-weight: bold;
+        padding: 6px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .match-header-grid {
+        display: grid;
+        grid-template-columns: 1fr 220px 1fr;
+        gap: 10px;
+        align-items: center;
+        background: #001433;
+        border: 1px solid #003380;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 12px;
+    }
+
+    .team-box {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .team-box.right { justify-content: flex-end; }
+
+    .team-logo {
+        width: 45px;
+        height: 45px;
+        object-fit: contain;
+        background: #000;
+        border-radius: 4px;
+        border: 1px solid #0044aa;
+    }
+
+    .team-name-display {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #ffffff;
+        text-transform: uppercase;
+    }
+
+    .match-title-display {
+        text-align: center;
+        color: #ffff00;
+        font-weight: bold;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+    }
+
+    /* PÁROK ÉS SZETTIK KIJELZŐI */
+    .pairs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    /* OSZLOPFEJLÉCEK */
+    .column-headers-p1, .column-headers-p2 {
+        display: flex;
+        align-items: center;
+        padding: 2px 8px;
+        margin-bottom: 2px;
+        gap: 6px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #88aacc;
+    }
+
+    .column-headers-p2 {
+        flex-direction: row-reverse;
+    }
+
+    /* HAZAI CSAPAT SORA */
+    .pair-row-p1 {
+        display: flex;
+        align-items: center;
+        background: #051124;
+        border: 1px solid #002b66;
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        gap: 6px;
+    }
+
+    /* VENDÉG CSAPAT SORA (Tükrözött elrendezés) */
+    .pair-row-p2 {
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        background: #051124;
+        border: 1px solid #002b66;
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        gap: 6px;
+    }
+
+    .pair-num {
+        font-weight: bold;
+        color: #00aaff;
+        font-size: 0.9rem;
+        width: 22px;
+        text-align: center;
+    }
+
+    .player-name {
+        flex: 1;
+        font-size: 0.95rem;
+        color: #fff;
+        font-weight: 600;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .pair-row-p2 .player-name, .column-headers-p2 .player-name-hdr {
+        text-align: right;
+    }
+
+    .sets-box {
+        display: flex;
+        gap: 3px;
+    }
+
+    /* SZETT ÉS ÖSSZFA CELLÁK BASE */
+    .set-cell, .set-hdr, .total-cell, .total-hdr, .sp-cell, .sp-hdr {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        border-radius: 4px;
+        transition: background-color 0.2s, color 0.2s;
+    }
+
+    .set-cell {
+        width: 32px;
+        height: 28px;
+        background: #000;
+        border: 1px solid #0044aa;
+        color: #88aacc;
+        font-size: 0.9rem;
+    }
+
+    .set-hdr {
+        width: 32px;
+        background: transparent;
+        border: none;
+        color: #88aacc;
+        font-size: 0.75rem;
+    }
+
+    .sp-cell {
+        width: 30px;
+        height: 28px;
+        background: #001838;
+        border: 1px solid #0044aa;
+        color: #00aaff;
+        font-size: 0.9rem;
+    }
+
+    .sp-hdr {
+        width: 30px;
+        background: transparent;
+        border: none;
+        color: #00aaff;
+        font-size: 0.75rem;
+    }
+
+    .total-cell {
+        min-width: 48px;
+        height: 28px;
+        background: #001838;
+        border: 1px solid #0044aa;
+        color: #ffffff;
+        font-size: 0.95rem;
+        padding: 0 4px;
+    }
+
+    .total-hdr {
+        min-width: 48px;
+        background: transparent;
+        border: none;
+        color: #ffff00;
+        font-size: 0.75rem;
+    }
+
+    /* DINAMIKUS EREDMÉNY SZÍNEZÉSEK */
+    .res-win {
+        background: #006622 !important;
+        color: #00ff66 !important;
+        border-color: #00cc44 !important;
+    }
+
+    .res-loss {
+        background: #660000 !important;
+        color: #ff4d4d !important;
+        border-color: #cc0000 !important;
+    }
+
+    .res-draw {
+        background: #554400 !important;
+        color: #ffff00 !important;
+        border-color: #cca300 !important;
+    }
+
+    .point-cell, .point-hdr {
+        width: 30px;
+        height: 28px;
+        background: #0044aa;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 0.95rem;
+        border-radius: 4px;
+    }
+
+    .point-hdr {
+        width: 30px;
+        background: transparent;
+        border: none;
+        color: #ffffff;
+        font-size: 0.75rem;
+    }
+
+    /* ÖSSZESÍTŐ SÁV */
+    .summary-bar {
+        display: grid;
+        grid-template-columns: 1fr 180px 1fr;
+        gap: 10px;
+        background: #000a1a;
+        border: 2px solid #00ff66;
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-top: 10px;
+        align-items: center;
+        text-align: center;
+    }
+
+    .sum-team-pins {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #00ff66;
+    }
+
+    .sum-score-display {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #ffff00;
+        background: #000;
+        border: 1px solid #333;
+        border-radius: 6px;
+        padding: 2px 10px;
+    }
+
+    .empty-msg {
+        text-align: center;
+        padding: 50px;
+        color: #8b949e;
+        background: #1e1e1e;
+        border-radius: 10px;
+        font-size: 1.1rem;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 768px) {
+        .pairs-grid { grid-template-columns: 1fr; }
+        .match-header-grid { grid-template-columns: 1fr; text-align: center; }
+        .team-box, .team-box.right { justify-content: center; }
+    }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- VEZÉRLŐ SÁV -->
+    <div class="top-controls">
+        <div class="control-group">
+            <label for="archiveSelect">MÉRKŐZÉS VÁLASZTÁS:</label>
+            <select id="archiveSelect" onchange="renderSelectedMatch()">
+                <option value="">-- Adatok betöltése... --</option>
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="searchInput">KERESÉS:</label>
+            <input type="text" id="searchInput" placeholder="Csapat, név vagy forduló..." oninput="filterMatches()">
+        </div>
+    </div>
+
+    <!-- JELMAGYARÁZAT -->
+    <div class="legend-bar">
+        <div class="legend-item"><span class="legend-tag tag-win">Zöld</span> Több fa / Nyert szett</div>
+        <div class="legend-item"><span class="legend-tag tag-loss">Piros</span> Kevesebb fa / Veszített szett</div>
+        <div class="legend-item"><span class="legend-tag tag-draw">Sárga</span> Egyenlő fa / Döntetlen szett</div>
+        <div class="legend-item"><span class="legend-tag tag-sp">SP</span> Szettpontok összege</div>
+        <div class="legend-item"><span class="legend-tag tag-mp">MP</span> Egyéni Mérkőzéspont</div>
+    </div>
+
+    <!-- KIJELZŐ MEGJELENÍTÉSE -->
+    <div id="boardDisplay" class="hidden">
+
+        <!-- IFJÚSÁGI KIJELZŐ TÁBLA -->
+        <div class="board-container">
+            <div class="section-banner">Ifjúsági Bajnoki Mérkőzés</div>
+            
+            <div class="match-header-grid">
+                <div class="team-box">
+                    <img id="ifiLogo1" class="team-logo" src="" alt="" onerror="this.style.display='none'">
+                    <span id="ifiTeam1" class="team-name-display">HAZAI</span>
+                </div>
+                <div id="ifiTitle" class="match-title-display">BAJNOKI MÉRKŐZÉS</div>
+                <div class="team-box right">
+                    <span id="ifiTeam2" class="team-name-display">VENDÉG</span>
+                    <img id="ifiLogo2" class="team-logo" src="" alt="" onerror="this.style.display='none'">
+                </div>
+            </div>
+
+            <div class="pairs-grid">
+                <div>
+                    <!-- Hazai Oszlopfejlécek -->
+                    <div class="column-headers-p1">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S1</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S4</span>
+                        </div>
+                        <span class="sp-hdr">SP</span>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="ifiP1Container"></div>
+                </div>
+
+                <div>
+                    <!-- Vendég Oszlopfejlécek -->
+                    <div class="column-headers-p2">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name player-name-hdr">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S4</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S1</span>
+                        </div>
+                        <span class="sp-hdr">SP</span>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="ifiP2Container"></div>
+                </div>
+            </div>
+
+            <div id="ifiSummary" class="summary-bar"></div>
+        </div>
+
+        <!-- FELNŐTT KIJELZŐ TÁBLA -->
+        <div class="board-container">
+            <div class="section-banner">Felnőtt Bajnoki Mérkőzés</div>
+            
+            <div class="match-header-grid">
+                <div class="team-box">
+                    <img id="adultLogo1" class="team-logo" src="" alt="" onerror="this.style.display='none'">
+                    <span id="adultTeam1" class="team-name-display">HAZAI</span>
+                </div>
+                <div id="adultTitle" class="match-title-display">BAJNOKI MÉRKŐZÉS</div>
+                <div class="team-box right">
+                    <span id="adultTeam2" class="team-name-display">VENDÉG</span>
+                    <img id="adultLogo2" class="team-logo" src="" alt="" onerror="this.style.display='none'">
+                </div>
+            </div>
+
+            <div class="pairs-grid">
+                <div>
+                    <!-- Hazai Oszlopfejlécek -->
+                    <div class="column-headers-p1">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S1</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S4</span>
+                        </div>
+                        <span class="sp-hdr">SP</span>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="adultP1Container"></div>
+                </div>
+
+                <div>
+                    <!-- Vendég Oszlopfejlécek -->
+                    <div class="column-headers-p2">
+                        <span style="width:22px;">#</span>
+                        <span class="player-name player-name-hdr">NÉV</span>
+                        <div class="sets-box">
+                            <span class="set-hdr">S4</span>
+                            <span class="set-hdr">S3</span>
+                            <span class="set-hdr">S2</span>
+                            <span class="set-hdr">S1</span>
+                        </div>
+                        <span class="sp-hdr">SP</span>
+                        <span class="total-hdr">ÖF</span>
+                        <span class="point-hdr">MP</span>
+                    </div>
+                    <div id="adultP2Container"></div>
+                </div>
+            </div>
+
+            <div id="adultSummary" class="summary-bar"></div>
+        </div>
+
+    </div>
+
+    <div id="noMatchMsg" class="empty-msg">
+        Válassz ki egy mentett mérkőzést a fenti listából a kijelző nézet betöltéséhez!
+    </div>
+</div>
+
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyD8o7xyCtxTJlQcM8z-29XTBOpBXrYbjOM",
@@ -17,7 +559,6 @@ let allMatches = {};
 db.ref('matches').once('value').then((snapshot) => {
     allMatches = snapshot.val() || {};
     populateSelectOptions(allMatches);
-    // Ha van a kiválasztóban már érték, azonnal rendereljük
     renderSelectedMatch();
 }).catch(err => {
     console.error("Adatbázis hiba:", err);
@@ -79,7 +620,7 @@ function renderSelectedMatch() {
 
     const data = allMatches[selectedId];
     boardDisplay.classList.remove('hidden');
-    noMatchMsg.classList.add('hidden'); // JAVÍTVA: classList.add használata
+    noMatchMsg.classList.add('hidden');
 
     if (data.ifi) {
         document.getElementById('ifiTitle').innerText = data.ifi.title || 'BAJNOKI MÉRKŐZÉS';
@@ -220,3 +761,5 @@ function renderCategoryDisplay(prefix, pairs, count) {
     `;
 }
 </script>
+</body>
+</html>
