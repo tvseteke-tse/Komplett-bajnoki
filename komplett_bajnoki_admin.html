@@ -96,6 +96,78 @@
         background: #d63027;
     }
 
+    /* ARCHÍVUM ÉS VEZÉRLŐ PANEL */
+    .archive-panel {
+        background: #141414;
+        border: 1px solid #0044aa;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 12px;
+    }
+    .archive-panel h3 {
+        color: #00ff66;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+    }
+    .archive-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 10px;
+        align-items: center;
+    }
+    .archive-group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+    .archive-group input[type="text"], .archive-group select {
+        flex: 1;
+        padding: 6px;
+        background: #252525;
+        border: 1px solid #444;
+        color: white;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    .btn-archive {
+        background: #00aa44;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+    .btn-archive:hover { background: #008833; }
+    .btn-load {
+        background: #0275d8;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 0.85rem;
+        white-space: nowrap;
+    }
+    .btn-load:hover { background: #025aa5; }
+    .btn-reset {
+        background: #d9534f;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        width: 100%;
+    }
+    .btn-reset:hover { background: #c9302c; }
+
     .section-title {
         text-align: center;
         color: #ffff00;
@@ -105,7 +177,6 @@
         letter-spacing: 1px;
     }
     
-    /* MECCS FEJLÉC JAVÍTVA */
     .match-header-grid {
         display: grid;
         grid-template-columns: 1fr 200px 1fr;
@@ -145,7 +216,6 @@
         cursor: not-allowed;
     }
 
-    /* PÁROSOK RÁCS JAVÍTVA */
     .pairs-grid {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -170,7 +240,6 @@
         text-align: center;
         flex-shrink: 0;
     }
-    /* Játékos név mezők pontosan 160px szélesek */
     .pair-row input[type="text"] {
         width: 160px; 
         flex-shrink: 0;
@@ -181,7 +250,6 @@
         border-radius: 5px;
         font-size: 0.9rem;
     }
-    /* Szett mezők rugalmas kitöltése */
     .sets-inputs {
         display: flex;
         gap: 3px;
@@ -228,6 +296,26 @@
     <div class="top-bar">
         <span style="font-size: 0.85rem; color: #8b949e;">Munkamenet: Bejelentkezve</span>
         <button id="auth-logout-btn" class="logout-btn">Kijelentkezés</button>
+    </div>
+
+    <!-- ARCHÍVUM ÉS FORDULÓ VEZÉRLŐ PANEL -->
+    <div class="archive-panel">
+        <h3>Mérkőzés Archívum & Forduló Kezelés</h3>
+        <div class="archive-grid">
+            <div class="archive-group">
+                <input type="text" id="matchIdInput" placeholder="Azonosító (pl. 2026_Fordulo_1)">
+                <button class="btn-archive" onclick="saveMatchToArchive()">💾 Mentés</button>
+            </div>
+            <div class="archive-group">
+                <select id="archiveSelect">
+                    <option value="">-- Mentett meccs betöltése --</option>
+                </select>
+                <button class="btn-load" onclick="loadMatchFromArchive()">📂 Betöltés</button>
+            </div>
+            <div>
+                <button class="btn-reset" onclick="resetLiveMatch()">⚠️ Új Mérkőzés (Nullázás)</button>
+            </div>
+        </div>
     </div>
 
     <div class="section-title">Ifjúsági Bajnoki Mérkőzés (2 fős)</div>
@@ -301,6 +389,7 @@ auth.onAuthStateChanged((user) => {
         authContainer.classList.add('hidden');
         adminContent.classList.remove('hidden');
         loadDatabaseData();
+        loadArchiveList();
     } else {
         authContainer.classList.remove('hidden');
         adminContent.classList.add('hidden');
@@ -431,24 +520,28 @@ function loadDatabaseData() {
     db.ref('osszevont_bajnoki_bowling').once('value', (snapshot) => {
         const data = snapshot.val();
         if (data) {
-            if (data.ifi) {
-                document.getElementById('titleIfi').value = data.ifi.title || '';
-                document.getElementById('team1Ifi').value = data.ifi.team1 || '';
-                document.getElementById('team2Ifi').value = data.ifi.team2 || '';
-                document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
-                document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
-                
-                document.getElementById('titleAdult').value = data.ifi.title || '';
-                document.getElementById('team1Adult').value = data.ifi.team1 || '';
-                document.getElementById('team2Adult').value = data.ifi.team2 || '';
-                
-                populatePairs('ifi', data.ifi.pairs);
-            }
-            if (data.adult) {
-                populatePairs('adult', data.adult.pairs);
-            }
+            updateAdminFormFields(data);
         }
     });
+}
+
+function updateAdminFormFields(data) {
+    if (data.ifi) {
+        document.getElementById('titleIfi').value = data.ifi.title || '';
+        document.getElementById('team1Ifi').value = data.ifi.team1 || '';
+        document.getElementById('team2Ifi').value = data.ifi.team2 || '';
+        document.getElementById('logo1Ifi').value = data.ifi.logo1 || 'https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png';
+        document.getElementById('logo2Ifi').value = data.ifi.logo2 || '';
+        
+        document.getElementById('titleAdult').value = data.ifi.title || '';
+        document.getElementById('team1Adult').value = data.ifi.team1 || '';
+        document.getElementById('team2Adult').value = data.ifi.team2 || '';
+        
+        populatePairs('ifi', data.ifi.pairs);
+    }
+    if (data.adult) {
+        populatePairs('adult', data.adult.pairs);
+    }
 }
 
 function populatePairs(prefix, pairsData) {
@@ -460,10 +553,118 @@ function populatePairs(prefix, pairsData) {
         if (p1Rows[idx] && p2Rows[idx]) {
             p1Rows[idx].querySelector('.p1-name').value = row.p1Name || '';
             p2Rows[idx].querySelector('.p2-name').value = row.p2Name || '';
-            row.p1Sets.forEach((val, sIdx) => { p1Rows[idx].querySelector(`.p1-s${sIdx}`).value = val || ''; });
-            row.p2Sets.forEach((val, sIdx) => { p2Rows[idx].querySelector(`.p2-s${sIdx}`).value = val || ''; });
+            
+            const p1Sets = row.p1Sets || [0,0,0,0];
+            const p2Sets = row.p2Sets || [0,0,0,0];
+            
+            p1Sets.forEach((val, sIdx) => { p1Rows[idx].querySelector(`.p1-s${sIdx}`).value = val || 0; });
+            p2Sets.forEach((val, sIdx) => { p2Rows[idx].querySelector(`.p2-s${sIdx}`).value = val || 0; });
         }
     });
+}
+
+// --- ARCHÍVUM ÉS NULLÁZÁS FUNKCIÓK ---
+
+function saveMatchToArchive() {
+    if (!auth.currentUser) return;
+    const matchId = document.getElementById('matchIdInput').value.trim();
+    if (!matchId) {
+        alert("Kérlek adj meg egy egyedi azonosítót a mentéshez! (Pl. 2026_Fordulo_1)");
+        return;
+    }
+
+    db.ref('osszevont_bajnoki_bowling').once('value')
+        .then((snapshot) => {
+            const currentData = snapshot.val();
+            if (!currentData) {
+                alert("Nincs menthető adat az élő kijelzőn!");
+                return;
+            }
+            currentData.savedAt = new Date().toISOString();
+            currentData.matchId = matchId;
+
+            return db.ref('matches/' + matchId).set(currentData);
+        })
+        .then(() => {
+            alert(`A(z) "${matchId}" mérkőzés sikeresen elmentve az archívumba!`);
+            document.getElementById('matchIdInput').value = '';
+            loadArchiveList();
+        })
+        .catch((err) => alert("Hiba a mentés során: " + err.message));
+}
+
+function loadArchiveList() {
+    db.ref('matches').once('value').then((snapshot) => {
+        const matches = snapshot.val();
+        const selectEl = document.getElementById('archiveSelect');
+        selectEl.innerHTML = '<option value="">-- Mentett meccs betöltése --</option>';
+
+        if (matches) {
+            Object.keys(matches).forEach((matchId) => {
+                const option = document.createElement('option');
+                option.value = matchId;
+                option.textContent = matchId;
+                selectEl.appendChild(option);
+            });
+        }
+    });
+}
+
+function loadMatchFromArchive() {
+    if (!auth.currentUser) return;
+    const selectedMatchId = document.getElementById('archiveSelect').value;
+    if (!selectedMatchId) {
+        alert("Kérlek válassz ki egy mérkőzést a listából!");
+        return;
+    }
+
+    if (confirm(`Biztosan be akarod tölteni a(z) "${selectedMatchId}" mérkőzést az élő kijelzőre? Ez felülírja a jelenleg kint lévő adatokat!`)) {
+        db.ref('matches/' + selectedMatchId).once('value')
+            .then((snapshot) => {
+                const archiveData = snapshot.val();
+                if (archiveData) {
+                    return db.ref('osszevont_bajnoki_bowling').set(archiveData);
+                }
+            })
+            .then(() => {
+                alert("Mérkőzés adatai betöltve az élő kijelzőre és az admin felületre!");
+                loadDatabaseData(); // Admin mezők azonnali frissítése
+            })
+            .catch((err) => alert("Hiba a betöltéskor: " + err.message));
+    }
+}
+
+function resetLiveMatch() {
+    if (!auth.currentUser) return;
+    if (confirm("⚠️ BIZTOSAN ÚJ MÉRKŐZÉST INDÍTASZ?\n\nGyőződj meg róla, hogy a jelenlegi mérkőzést elmentetted az archívumba! Ez a művelet nullázza a kijelzőt.")) {
+        const defaultLogo = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png";
+        
+        const emptyState = {
+            ifi: {
+                title: "BAJNOKI MÉRKŐZÉS",
+                team1: "Hazai",
+                team2: "Vendég",
+                logo1: defaultLogo,
+                logo2: "",
+                pairs: Array(2).fill({ p1Name: "", p1Sets: [0,0,0,0], p2Name: "", p2Sets: [0,0,0,0] })
+            },
+            adult: {
+                title: "BAJNOKI MÉRKŐZÉS",
+                team1: "Hazai",
+                team2: "Vendég",
+                logo1: defaultLogo,
+                logo2: "",
+                pairs: Array(6).fill({ p1Name: "", p1Sets: [0,0,0,0], p2Name: "", p2Sets: [0,0,0,0] })
+            }
+        };
+
+        db.ref('osszevont_bajnoki_bowling').set(emptyState)
+            .then(() => {
+                alert("Az élő kijelző és az admin felület sikeresen nullázva!");
+                updateAdminFormFields(emptyState); // Admin mezők azonnali ürítése
+            })
+            .catch((err) => alert("Hiba a nullázáskor: " + err.message));
+    }
 }
 </script>
 </body>
