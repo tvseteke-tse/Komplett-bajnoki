@@ -136,7 +136,8 @@
         gap: 10px;
     }
 
-    .pair-row {
+    /* HAZAI CSAPAT SORA (Alapértelmezett sorrend) */
+    .pair-row-p1 {
         display: flex;
         align-items: center;
         background: #051124;
@@ -144,6 +145,20 @@
         border-radius: 6px;
         padding: 4px 8px;
         margin-bottom: 4px;
+        gap: 6px;
+    }
+
+    /* VENDÉG CSAPAT SORA (Tükrözött sorrend) */
+    .pair-row-p2 {
+        display: flex;
+        flex-direction: row-reverse; /* Tükrözi az elemek elhelyezkedését */
+        align-items: center;
+        background: #051124;
+        border: 1px solid #002b66;
+        border-radius: 6px;
+        padding: 4px 8px;
+        margin-bottom: 4px;
+        gap: 6px;
     }
 
     .pair-num {
@@ -151,6 +166,7 @@
         color: #00aaff;
         font-size: 0.9rem;
         width: 22px;
+        text-align: center;
     }
 
     .player-name {
@@ -162,11 +178,15 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+    
+    /* Vendég játékos neve jobbra igazítva */
+    .pair-row-p2 .player-name {
+        text-align: right;
+    }
 
     .sets-box {
         display: flex;
         gap: 3px;
-        margin: 0 6px;
     }
 
     .set-cell {
@@ -209,7 +229,6 @@
         font-weight: bold;
         font-size: 0.95rem;
         border-radius: 4px;
-        margin-left: 4px;
     }
 
     /* ÖSSZESÍTŐ (SCOREBOARD) ALSÓ SÁV */
@@ -354,7 +373,6 @@ const db = firebase.database();
 
 let allMatches = {};
 
-// Mentett meccsek kiolvasása a Firebase-ből
 db.ref('matches').once('value').then((snapshot) => {
     allMatches = snapshot.val() || {};
     populateSelectOptions(allMatches);
@@ -414,7 +432,6 @@ function renderSelectedMatch() {
     boardDisplay.classList.remove('hidden');
     noMatchMsg.classList.add('hidden');
 
-    // IFJÚSÁGI KINYERÉSE ÉS RENDERE LÉSE
     if (data.ifi) {
         document.getElementById('ifiTitle').innerText = data.ifi.title || 'BAJNOKI MÉRKŐZÉS';
         document.getElementById('ifiTeam1').innerText = data.ifi.team1 || 'HAZAI';
@@ -425,7 +442,6 @@ function renderSelectedMatch() {
         renderCategoryDisplay('ifi', data.ifi.pairs || [], 2);
     }
 
-    // FELNŐTT KINYERÉSE ÉS RENDERELÉSE
     if (data.adult) {
         document.getElementById('adultTitle').innerText = data.adult.title || 'BAJNOKI MÉRKŐZÉS';
         document.getElementById('adultTeam1').innerText = data.adult.team1 || 'HAZAI';
@@ -492,9 +508,9 @@ function renderCategoryDisplay(prefix, pairs, count) {
         team1MatchPoints += p1Pts;
         team2MatchPoints += p2Pts;
 
-        // Hazai játékos kijelző sora
+        // Hazai játékos kijelző sora (Balról jobbra)
         p1Container.innerHTML += `
-            <div class="pair-row">
+            <div class="pair-row-p1">
                 <span class="pair-num">${i+1}.</span>
                 <span class="player-name">${pair.p1Name || '-'}</span>
                 <div class="sets-box">
@@ -505,9 +521,9 @@ function renderCategoryDisplay(prefix, pairs, count) {
             </div>
         `;
 
-        // Vendég játékos kijelző sora
+        // Vendég játékos kijelző sora (TÜKRÖZVE: Jobbról balra)
         p2Container.innerHTML += `
-            <div class="pair-row">
+            <div class="pair-row-p2">
                 <span class="pair-num">${i+1}.</span>
                 <span class="player-name">${pair.p2Name || '-'}</span>
                 <div class="sets-box">
@@ -524,7 +540,6 @@ function renderCategoryDisplay(prefix, pairs, count) {
     else if (team1TotalPins < team2TotalPins) team2MatchPoints += 2;
     else if (team1TotalPins > 0) { team1MatchPoints += 1; team2MatchPoints += 1; }
 
-    // Összesítő alsó sáv megjelenítése
     summaryEl.innerHTML = `
         <div class="sum-team-pins">Összfa: ${team1TotalPins}</div>
         <div class="sum-score-display">${team1MatchPoints} : ${team2MatchPoints}</div>
