@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Komplett Bajnoki Kijelző</title>
+<title>TTSE Bajnoki Mérkőzés Élő Eredmények</title>
 <style>
     * {
         box-sizing: border-box;
@@ -12,7 +12,7 @@
     }
     html, body {
         width: 100vw;
-        height: 100dvh; /* Dinamikus kijelzőmagasság mobil böngészőkhöz */
+        height: 100dvh;
         overflow: hidden;
         background-color: #000c1f;
         color: #ffff00;
@@ -39,7 +39,6 @@
         overflow: hidden;
     }
     
-    /* Pontos arányok a keretben */
     #blockIfi { height: 31%; flex: 0 0 31%; }
     #blockAdult { height: 67%; flex: 0 0 67%; }
 
@@ -90,7 +89,7 @@
         flex-shrink: 0;
     }
 
-    /* TÁBLÁZAT PRÉSELÉSE */
+    /* TÁBLÁZAT */
     .table-container {
         flex: 1 1 auto;
         min-height: 0;
@@ -138,49 +137,71 @@
     }
     .name-col.right { text-align: right !important; }
 
-    /* SZETT BOX FORMÁZÁS */
-    .set-box {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 90%;
-        height: 85%;
-        border-radius: 4px;
-        background-color: rgba(0, 30, 70, 0.5);
-        color: #ffffff;
+    /* SZETT ÉS ÖSSZFA CELLA FORMÁTUMOK */
+    .set-cell {
         font-weight: bold;
-        transition: all 0.2s ease;
+        text-align: center;
+        border-radius: 4px;
+        transition: all 0.3s ease;
     }
 
-    .set-box.win {
-        background-color: #00ff66;
-        color: #002b00;
-        box-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
+    /* Éppen ezen a pályán dob (Aktív sáv) */
+    .lane-active {
+        border: 2px solid #00ffff !important;
+        box-shadow: 0 0 8px #00ffff;
     }
 
-    .set-box.lose {
-        background-color: #ff3333;
-        color: #330000;
-        box-shadow: 0 0 6px rgba(255, 51, 51, 0.6);
+    /* Szett eredmény állapotok */
+    .set-win {
+        background-color: rgba(0, 200, 80, 0.25) !important;
+        color: #00ff66 !important;
+        font-weight: 900;
+        text-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
     }
 
-    .set-box.draw {
-        background-color: #ffff00;
-        color: #333300;
-        box-shadow: 0 0 6px rgba(255, 255, 0, 0.6);
+    .set-lose {
+        background-color: rgba(220, 40, 40, 0.2) !important;
+        color: #ff4d4d !important;
+        opacity: 0.85;
     }
-    
+
+    .set-draw {
+        background-color: rgba(230, 230, 0, 0.2) !important;
+        color: #ffff00 !important;
+        text-shadow: 0 0 6px rgba(255, 255, 0, 0.6);
+    }
+
+    .set-empty {
+        color: #445577;
+    }
+
+    /* Összfa cella formázása */
     .val-sp { color: #ffffff; }
-    .val-ges { color: #ffffff; }
-    .val-ges.win { color: #00ff66; text-shadow: 0 0 6px rgba(0, 255, 102, 0.5); }
-    .val-ges.draw { color: #ffff00; text-shadow: 0 0 6px rgba(255, 255, 0, 0.5); }
-    .val-mp { color: #ffff00; background-color: #00122e; }
-    .divider { border-left: 1px solid #0044aa; border-right: 1px solid #0044aa; }
     
-    /* LÁBLÉC FIXÁLÁSA */
+    .val-ges { 
+        color: #ffffff; 
+        font-weight: bold;
+        border-radius: 4px;
+    }
+    .val-ges.win { 
+        color: #00ff66 !important; 
+        text-shadow: 0 0 8px rgba(0, 255, 102, 0.6);
+        background-color: rgba(0, 255, 102, 0.1);
+    }
+    .val-ges.lose { 
+        color: #ff4d4d !important; 
+        opacity: 0.85;
+    }
+    .val-ges.draw { 
+        color: #ffff00 !important; 
+    }
+
+    .val-mp { color: #ffff00; background-color: #00122e; }
+    .divider { border-left: 2px solid #0044aa; border-right: 2px solid #0044aa; }
+    
     .footer-score {
         flex: 0 0 auto;
-        border-top: 1px solid #0044aa;
+        border-top: 2px solid #0044aa;
         padding-top: 0.1dvh;
         display: flex;
         justify-content: space-between;
@@ -211,22 +232,24 @@
         color: #00ff66; 
         font-size: clamp(0.7rem, 1.6dvh, 1.3rem); 
         font-weight: bold; 
-        text-shadow: 0 0 8px rgba(0, 255, 102, 0.4); 
+        text-shadow: 0 0 10px rgba(0, 255, 102, 0.4); 
         line-height: 1; 
     }
 
-    /* DIFF FORMÁZÁSA A FA MELLETT */
+    /* KÜLÖNBSÉG (DIFF) FORMÁZÁSA */
     .diff-val {
         font-size: clamp(0.55rem, 1.1dvh, 0.85rem);
         font-weight: bold;
     }
-    .diff-val.plus { color: #00ff66; text-shadow: 0 0 5px rgba(0, 255, 102, 0.4); }
-    .diff-val.minus { color: #ff3333; text-shadow: 0 0 5px rgba(255, 51, 51, 0.4); }
-    .diff-val.zero { color: #ffff00; text-shadow: 0 0 5px rgba(255, 255, 0, 0.4); }
+    .diff-val.plus { color: #00ff66; text-shadow: 0 0 8px rgba(0, 255, 102, 0.5); }
+    .diff-val.minus { color: #ff3333; text-shadow: 0 0 8px rgba(255, 51, 51, 0.5); }
+    .diff-val.zero { color: #ffff00; text-shadow: 0 0 8px rgba(255, 255, 0, 0.5); }
 
     .match-divider {
-        height: 2px;
+        height: 6px;
         background: linear-gradient(90deg, #0044aa, #00ff66, #ffff00, #00ff66, #0044aa);
+        border-radius: 3px;
+        box-shadow: 0 0 12px rgba(0, 255, 102, 0.8);
         flex: 0 0 auto;
     }
 </style>
@@ -345,7 +368,6 @@
 </div>
 
 <script>
-// Külön alapértelmezett logók a Hazai és Vendég csapatoknak
 const DEFAULT_HAZAI_LOGO = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png";
 const DEFAULT_VENDEG_LOGO = "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/7767f16ffa80fcf1cdcba723498b6a26453fcf2c/let%C3%B6lt%C3%A9s-removebg-preview.png";
 
@@ -370,16 +392,21 @@ db.ref('osszevont_bajnoki_bowling').on('value', (snapshot) => {
     }
 });
 
-function getSetBoxHTML(val1, val2) {
-    if (!val1 && val1 !== 0) return `<div class="set-box"></div>`;
-    
-    let statusClass = '';
-    if (val1 > 0 && val2 > 0) {
-        if (val1 > val2) statusClass = 'win';
-        else if (val1 < val2) statusClass = 'lose';
-        else statusClass = 'draw';
+function getSetCellData(val1, val2) {
+    if (!val1 && val1 !== 0) {
+        return { val: '', class: 'set-cell set-empty' };
     }
-    return `<div class="set-box ${statusClass}">${val1 || ''}</div>`;
+    
+    let statusClass = 'set-cell';
+    if (val1 > 0 && val2 > 0) {
+        if (val1 > val2) statusClass += ' set-win';
+        else if (val1 < val2) statusClass += ' set-lose';
+        else statusClass += ' set-draw';
+    } else if (val1 > 0) {
+        statusClass += ' set-win';
+    }
+    
+    return { val: val1, class: statusClass };
 }
 
 function updateLogo(elementId, logoUrl, fallbackUrl = '') {
@@ -400,7 +427,6 @@ function renderSection(type, sectionData) {
     document.getElementById(`team1${type}`).innerText = sectionData.team1 || 'HAZAI';
     document.getElementById(`team2${type}`).innerText = sectionData.team2 || 'VENDÉG';
 
-    // Külön kezelt fallback logók a Hazai és a Vendég oldalra
     updateLogo(`logo1${type}`, sectionData.logo1, DEFAULT_HAZAI_LOGO);
     updateLogo(`logo2${type}`, sectionData.logo2, DEFAULT_VENDEG_LOGO);
 
@@ -437,12 +463,13 @@ function renderSection(type, sectionData) {
             totalSp1 += sp1; totalSp2 += sp2;
             totalMp1 += mp1; totalMp2 += mp2;
 
-            // Összes fa színezése az MP alapján (nyertes: zöld, döntetlen: sárga)
             let ges1Class = '', ges2Class = '';
             if (sum1 > 0 || sum2 > 0) {
                 if (mp1 > mp2) {
                     ges1Class = 'win';
+                    ges2Class = 'lose';
                 } else if (mp2 > mp1) {
+                    ges1Class = 'lose';
                     ges2Class = 'win';
                 } else {
                     ges1Class = 'draw';
@@ -451,18 +478,27 @@ function renderSection(type, sectionData) {
             }
 
             const tr = document.createElement('tr');
+            
+            const p1Cells = row.p1Sets.map((s1, i) => {
+                const cellData = getSetCellData(s1, row.p2Sets[i]);
+                return `<td class="${cellData.class}">${cellData.val}</td>`;
+            }).join('');
+
+            const p2Cells = row.p2Sets.slice().reverse().map((s2, i) => {
+                const origIdx = 3 - i;
+                const cellData = getSetCellData(s2, row.p1Sets[origIdx]);
+                return `<td class="${cellData.class}">${cellData.val}</td>`;
+            }).join('');
+
             tr.innerHTML = `
                 <td class="name-col">${row.p1Name || '-'}</td>
-                ${row.p1Sets.map((s1, i) => `<td>${getSetBoxHTML(s1, row.p2Sets[i])}</td>`).join('')}
+                ${p1Cells}
                 <td class="val-sp">${sp1}</td>
                 <td class="val-ges ${ges1Class}">${sum1}</td>
                 <td class="val-mp divider">${mp1}:${mp2}</td>
                 <td class="val-ges ${ges2Class}">${sum2}</td>
                 <td class="val-sp">${sp2}</td>
-                ${row.p2Sets.slice().reverse().map((s2, i) => {
-                    const origIdx = 3 - i;
-                    return `<td>${getSetBoxHTML(s2, row.p1Sets[origIdx])}</td>`;
-                }).join('')}
+                ${p2Cells}
                 <td class="name-col right">${row.p2Name || '-'}</td>
             `;
             tbody.appendChild(tr);
@@ -480,7 +516,6 @@ function renderSection(type, sectionData) {
     document.getElementById(`ges2${type}`).innerText = totalGes2;
     document.getElementById(`mp${type}`).innerText = `${totalMp1 + teamBonus1} : ${totalMp2 + teamBonus2}`;
 
-    // Különbség kiszámítása
     const diff1El = document.getElementById(`diff1${type}`);
     const diff2El = document.getElementById(`diff2${type}`);
     const diff = totalGes1 - totalGes2;
