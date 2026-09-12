@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TTSE Bajnoki Mérkőzés Kijelző</title>
+<title>Komplett Bajnoki Kijelző</title>
 <style>
     * {
         box-sizing: border-box;
@@ -120,7 +120,7 @@
         font-weight: bold; 
         border-bottom: 1px solid #002b66; 
         vertical-align: middle;
-        padding: 0;
+        padding: 0.1dvh 0.1vw;
     }
 
     #blockIfi .board-table td { font-size: clamp(0.55rem, 1.3dvh, 0.95rem); }
@@ -137,11 +137,38 @@
         text-overflow: ellipsis;
     }
     .name-col.right { text-align: right !important; }
-    
-    .val-set { color: #ffffff; }
-    .val-set.win { color: #00ff66; text-shadow: 0 0 6px rgba(0, 255, 102, 0.5); }
-    .val-set.lose { color: #ff3333; text-shadow: 0 0 6px rgba(255, 51, 51, 0.5); }
-    .val-set.draw { color: #ffff00; text-shadow: 0 0 6px rgba(255, 255, 0, 0.5); }
+
+    /* SZETT BOX FORMÁZÁS */
+    .set-box {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 90%;
+        height: 85%;
+        border-radius: 4px;
+        background-color: rgba(0, 30, 70, 0.5);
+        color: #ffffff;
+        font-weight: bold;
+        transition: all 0.2s ease;
+    }
+
+    .set-box.win {
+        background-color: #00ff66;
+        color: #002b00;
+        box-shadow: 0 0 6px rgba(0, 255, 102, 0.6);
+    }
+
+    .set-box.lose {
+        background-color: #ff3333;
+        color: #330000;
+        box-shadow: 0 0 6px rgba(255, 51, 51, 0.6);
+    }
+
+    .set-box.draw {
+        background-color: #ffff00;
+        color: #333300;
+        box-shadow: 0 0 6px rgba(255, 255, 0, 0.6);
+    }
     
     .val-sp { color: #ffffff; }
     .val-ges { color: #ffffff; }
@@ -343,13 +370,16 @@ db.ref('osszevont_bajnoki_bowling').on('value', (snapshot) => {
     }
 });
 
-function getSetClass(val1, val2) {
+function getSetBoxHTML(val1, val2) {
+    if (!val1 && val1 !== 0) return `<div class="set-box"></div>`;
+    
+    let statusClass = '';
     if (val1 > 0 && val2 > 0) {
-        if (val1 > val2) return 'val-set win';
-        if (val1 < val2) return 'val-set lose';
-        return 'val-set draw';
+        if (val1 > val2) statusClass = 'win';
+        else if (val1 < val2) statusClass = 'lose';
+        else statusClass = 'draw';
     }
-    return 'val-set';
+    return `<div class="set-box ${statusClass}">${val1 || ''}</div>`;
 }
 
 function updateLogo(elementId, logoUrl, fallbackUrl = '') {
@@ -423,7 +453,7 @@ function renderSection(type, sectionData) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td class="name-col">${row.p1Name || '-'}</td>
-                ${row.p1Sets.map((s1, i) => `<td class="${getSetClass(s1, row.p2Sets[i])}">${s1 || ''}</td>`).join('')}
+                ${row.p1Sets.map((s1, i) => `<td>${getSetBoxHTML(s1, row.p2Sets[i])}</td>`).join('')}
                 <td class="val-sp">${sp1}</td>
                 <td class="val-ges ${ges1Class}">${sum1}</td>
                 <td class="val-mp divider">${mp1}:${mp2}</td>
@@ -431,7 +461,7 @@ function renderSection(type, sectionData) {
                 <td class="val-sp">${sp2}</td>
                 ${row.p2Sets.slice().reverse().map((s2, i) => {
                     const origIdx = 3 - i;
-                    return `<td class="${getSetClass(s2, row.p1Sets[origIdx])}">${s2 || ''}</td>`;
+                    return `<td>${getSetBoxHTML(s2, row.p1Sets[origIdx])}</td>`;
                 }).join('')}
                 <td class="name-col right">${row.p2Name || '-'}</td>
             `;
