@@ -143,7 +143,7 @@
     .lane-bg-1 { background-color: rgba(0, 85, 70, 0.25); }
     .lane-bg-2 { background-color: rgba(60, 20, 70, 0.25); }
 
-    /* SZETT ÉS EREDMÉNY DOBOZOK (ARÁNYOSÍTOTT KINÉZET) */
+    /* SZETT EREDMÉNY DOBOZOK - MAGAS KONTRASZTÚ STÍLUS */
     .set-box {
         display: inline-flex;
         align-items: center;
@@ -155,35 +155,38 @@
         font-weight: 900;
         letter-spacing: 0.5px;
         margin: auto;
-        box-shadow: inset 0 0 4px rgba(0,0,0,0.5);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.6);
         transition: all 0.2s ease;
     }
 
-    /* Szett eredmény állapotok */
+    /* Győztes szett - Mélyzöld alapon világító zöld-fehér szám */
     .set-win {
-        background: linear-gradient(180deg, #008855, #004d30) !important;
-        color: #00ff66 !important;
-        border: 1px solid #00ff66;
-        text-shadow: 0 0 6px rgba(0, 255, 102, 0.8);
+        background: linear-gradient(180deg, #004d25, #002b15) !important;
+        color: #00ff77 !important;
+        border: 1px solid #00ff77;
+        text-shadow: 0 0 4px #00ff77, 0 0 8px #000000;
     }
 
+    /* Vesztes szett - Sötét vöröses-lila alapon hófehér szám */
     .set-lose {
-        background: linear-gradient(180deg, #662233, #33111a) !important;
-        color: #ff5555 !important;
-        border: 1px solid #ff3333;
-        opacity: 0.9;
+        background: linear-gradient(180deg, #5a121e, #33080e) !important;
+        color: #ffffff !important;
+        border: 1px solid #ff4d6d;
+        text-shadow: 0 0 6px #ff0033, 0 0 8px #000000;
     }
 
+    /* Döntetlen szett - Mély sárga/barna alapon éles citromsárga szám */
     .set-draw {
-        background: linear-gradient(180deg, #666600, #333300) !important;
+        background: linear-gradient(180deg, #554400, #332800) !important;
         color: #ffff00 !important;
         border: 1px solid #ffff00;
-        text-shadow: 0 0 6px rgba(255, 255, 0, 0.8);
+        text-shadow: 0 0 4px #ffff00, 0 0 8px #000000;
     }
 
+    /* Üres szett */
     .set-empty {
         background-color: transparent;
-        border: 1px dashed rgba(255, 255, 255, 0.1);
+        border: 1px dashed rgba(255, 255, 255, 0.15);
         color: #334466;
     }
 
