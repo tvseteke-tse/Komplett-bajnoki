@@ -90,12 +90,6 @@
         flex-shrink: 0;
     }
 
-    .matesz-logo {
-        height: 2dvh;
-        filter: drop-shadow(0 0 5px rgba(0, 255, 102, 0.5));
-        flex-shrink: 0;
-    }
-
     /* TÁBLÁZAT PRÉSELÉSE */
     .table-container {
         flex: 1 1 auto;
@@ -228,8 +222,6 @@
                 <img id="logo1Ifi" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" alt="">
             </div>
 
-            <img class="matesz-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/871712f3931057892c33bbc94359b6dd73762870/MATESZ_logo-removebg-preview.png" alt="MATESZ Logo">
-
             <div class="team-box">
                 <img id="logo2Ifi" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/7767f16ffa80fcf1cdcba723498b6a26453fcf2c/let%C3%B6lt%C3%A9s-removebg-preview.png" alt="">
                 <span id="team2Ifi">VENDÉG IFI</span>
@@ -282,8 +274,6 @@
                 <span id="team1Adult">HAZAI</span>
                 <img id="logo1Adult" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png" alt="">
             </div>
-
-            <img class="matesz-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/871712f3931057892c33bbc94359b6dd73762870/MATESZ_logo-removebg-preview.png" alt="MATESZ Logo">
 
             <div class="team-box">
                 <img id="logo2Adult" class="team-logo" src="https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/7767f16ffa80fcf1cdcba723498b6a26453fcf2c/let%C3%B6lt%C3%A9s-removebg-preview.png" alt="">
@@ -354,10 +344,12 @@ db.ref('osszevont_bajnoki_bowling').on('value', (snapshot) => {
 });
 
 function getSetClass(val1, val2) {
-    if (val1 === 0 && val2 === 0) return 'val-set';
-    if (val1 > val2) return 'val-set win';
-    if (val1 < val2) return 'val-set lose';
-    return 'val-set draw';
+    if (val1 > 0 && val2 > 0) {
+        if (val1 > val2) return 'val-set win';
+        if (val1 < val2) return 'val-set lose';
+        return 'val-set draw';
+    }
+    return 'val-set';
 }
 
 function updateLogo(elementId, logoUrl, fallbackUrl = '') {
