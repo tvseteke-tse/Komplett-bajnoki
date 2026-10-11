@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <title>Teke Bajnoki Admin - TV Kijelző Szinkronnal</title>
+    <!-- Firebase SDK betöltése -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 25px; }
+        .category-tabs { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { padding: 10px 20px; font-size: 16px; font-weight: bold; cursor: pointer; border: none; background: #bdc3c7; color: #fff; border-radius: 4px; }
+        .tab-btn.active { background: #2980b9; }
+        .match-setup { display: flex; justify-content: space-between; background: #ecf0f1; padding: 15px; border-radius: 6px; margin-bottom: 20px; align-items: center; }
+        .team-select-box { flex: 1; margin: 0 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        select, input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #34495e; color: white; font-size: 14px; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .set-input { width: 50px; text-align: center; padding: 5px; }
+        .btn { background-color: #27ae60; color: white; border: none; padding: 10px 20px; font-size: 16px; border-radius: 4px; cursor: pointer; }
+        .btn:hover { background-color: #219653; }
+        .footer-panel { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+        .sync-status { font-weight: bold; color: #e67e22; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Teke Bajnoki Admin & TV Kijelző Vezérlő</h1>
+
+    <!-- Kategória váltó (Ifi / Felnőtt) -->
+    <div class="category-tabs">
+        <button id="btnAdult" class="tab-btn active" onclick="switchCategory('adult')">Felnőtt Bajnokság</button>
+        <button id="btnIfi" class="tab-btn" onclick="switchCategory('ifi')">Ifi Bajnokság</button>
+    </div>
+
+    <div class="match-setup">
+        <div class="team-select-box">
+            <label for="homeTeam">Hazai Csapat:</label>
+            <select id="homeTeam" onchange="updateTeamPlayers('home'); saveDataToFirebase();">
+                <option value="">-- Válassz hazai csapatot --</option>
+            </select>
+        </div>
+        <div style="font-weight: bold; font-size: 20px; padding-top: 20px;">VS</div>
+        <div class="team-select-box">
+            <label for="awayTeam">Vendég Csapat:</label>
+            <select id="awayTeam" onchange="updateTeamPlayers('away'); saveDataToFirebase();">
+                <option value="">-- Válassz vendég csapatot --</option>
+            </select>
+        </div>
+    </div>
+
+    <h3>Mérkőzés Állása / Játékosok és Szettek</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Pár</th>
+                <th>Hazai Játékos</th>
+                <th>1. Szett</th>
+                <th>2. Szett</th>
+                <th>3. Szett</th>
+                <th>4. Szett</th>
+                <th>Vendég Játékos</th>
+                <th>1. Szett</th>
+                <th>2. Szett</th>
+                <th>3. Szett</th>
+                <th>4. Szett</th>
+            </tr>
+        </thead>
+        <tbody id="lineupTable">
+            <!-- Dinamikusan generált sorok -->
+        </tbody>
+    </table>
+
+    <div class="footer-panel">
+        <span id="syncStatus" class="sync-status">Adatok szinkronizálva ✔</span>
+        <button class="btn" onclick="saveDataToFirebase()">Mentés és Küldés a TV Kijelzőre</button>
+    </div>
+</div>
+
+<script>
+    // TV kijelződ által használt Firebase kapcsolat beállításai
+    const firebaseConfig = {
+        apiKey: "aizasyd8o7xyctxtjlqcm8z-29xtbopbxrybjom",
+        authDomain: "teke-eredmenyek.firebaseapp.com",
+        databaseURL: "https://teke-eredmenyek-default-rtdb.firebaseio.com",
+        projectId: "teke-eredmenyek",
+        storageBucket: "teke-eredmenyek.appspot.com"
+    };
+
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+
+    let currentCategory = 'adult'; // alapértelmezett a felnőtt
+
+    const database = {
+        "Bátonyterenyei TK": ["Fancsik István", "Gál Csanád", "Gál Levente", "Hetei Arnold", "Horváth János", "Mártas Ferenc", "Mészáros Artúr", "Molnár Márton", "Molnár Zoltán", "Nagy Imre", "Pintér Dániel", "Sátsir Zoltán", "Simon Gergő"],
+        "BKV Előre SC": ["Aranyosi László", "Bogdly Attila", "Csejtei Norbert", "Egyed Bence", "Endler Csaba", "Gönczi Ádám Péter", "Józsa István", "Kocza Gábor", "Kovács Péter", "Pete László", "Szarvas Balázs", "Tiszai Dorián Márk"],
+        "Dynamo SC": ["Buzogány Gábor", "Fülepl Attila", "Frink Norbert", "Hámori Norbert", "Jancsár Péter", "Jancsár Zsombor", "Kecskése Ferenc", "Lahoczki Dávid", "Nigel Péter", "Szakács Péter Márk", "Zombori Norbert"],
+        "Fővárosi Vízművek SK": ["Bakos József Károly", "Csompei Tamás Dániel", "Grünwald Gyula József", "Horváth József Imre", "Kiss Péter", "Kökény Miklós", "Polgárdi Milán Máté", "Sebeestyén Szabolcs Zoltán", "Szám Norbert", "Szász Roland", "Szilágyi Tamás", "Virág Bendegúz László"],
+        "Kazincbarcikai Vegyész TSE": ["Ander Tamás", "Csanádi Bence", "Csanádi Csaba", "Csinyi Gábor", "Fekete Patrik Róbert", "Krehlík László", "Orosz Balázs", "Orosz István", "Ragályi Tamás", "Szabó Zoltán", "Tanyi Gábor"],
+        "MVM Gáz SE": ["Bányai Bálint Zsolt", "Rólya Tamás", "Bottyányi Gergely", "Budaházi Bence", "Császár Péter", "Kiss György", "Nyul Tamás", "Paulovita Pál Jánca", "Szentgyörgyi Máté", "Takács János", "Fülöp Róbert"],
+        "Nyergesújfalu SE": ["Gál Csaba", "Hergéh János", "Jánosi Csaba", "Jó-Dobronye Kálmán Bence", "Kovács Antal", "Locker Bálint", "Mártai Roland", "Németh Gábor", "Pál Bertalan", "Pálinkó Zsombor Mihály", "Simonfi Zsolt Attila", "Sinogli Dávid", "Szakács Viktor", "Székely Zsolt László"],
+        "Salgótarjáni TK": ["Balázs Péter", "Bóta Ervin", "Csikos Renátó", "Gubán Ferenc", "Hacker Dezső", "Horváth Attila", "Kazinczy Máté", "Kiss Máté", "Kocsa Róbert Levente", "Lakatos Gábor", "Stréer Tamás", "Szabó Richárd Tibor", "Szalko Tamás", "Telek Tamás"],
+        "Szolnoki MÁV SE": ["Bíró Ervin", "Bíró Norbert", "Földi József", "Holp József", "Ifj. Rácz Sándor Zoltán", "Ifj. Székely Károly", "Juhász Marcell Donát", "Nyári Krisztofer", "Pintér Lajos", "Szabó Gábor", "Tóth Zoltán", "Varga István"],
+        "Tiszakécske TSE": ["Bese Ferenc", "Dömötör Balázs", "Ézsiás Kristóf", "Hűvös Zsolt", "Kecskeméti Sebestyén Dominik", "Kiss Viktor", "Kokavecz Dávid", "Kokavecz Ferenc", "Méri Martin Márk", "Óháti Imre László", "Schiffert Dominik", "Schiffert Roland", "Sulák Olivér", "Szabó Zsolt", "Szarka Péter", "Váradi Kálmán Zsombor"],
+        "Tüker TSE": ["Andróni Csaba", "Auer Mátyás", "Barkó Csaba", "Csesznok Tamás", "Gál Lajos", "Gulyás Csaba Miklós", "Kehl Zoltán", "Pocsal Bálint", "Puporka Krisztián Aladár", "Sáfián Kornél", "Takács Zoltán", "Tóth Dénes"],
+        "VILLJAV PRIMA SE": ["Bencsik Attila", "Czakó Szabolcs Sándor", "Egyed Ferenc", "Gyuricsák Péter", "Hercz Richárd Sándor", "Ifj. Szojka Miklós", "Mogyorósi Péter", "Molnár Dávid", "Szilágyi Sándor", "Szluka István Ferenc", "Szujka Miklós"]
+    };
+
+    window.onload = function() {
+        const homeSelect = document.getElementById('homeTeam');
+        const awaySelect = document.getElementById('awayTeam');
+
+        for (let team in database) {
+            homeSelect.innerHTML += `<option value="${team}">${team}</option>`;
+            awaySelect.innerHTML += `<option value="${team}">${team}</option>`;
+        }
+
+        generateTableRows();
+        loadDataFromFirebase(currentCategory);
+    };
+
+    function switchCategory(cat) {
+        currentCategory = cat;
+        document.getElementById('btnAdult').className = cat === 'adult' ? 'tab-btn active' : 'tab-btn';
+        document.getElementById('btnIfi').className = cat === 'ifi' ? 'tab-btn active' : 'tab-btn';
+        loadDataFromFirebase(cat);
+    }
+
+    function generateTableRows() {
+        const tbody = document.getElementById('lineupTable');
+        tbody.innerHTML = '';
+        for (let i = 1; i <= 6; i++) {
+            tbody.innerHTML += `
+                <tr>
+                    <td><strong>${i}. pár</strong></td>
+                    <td><select id="home_player_${i}" onchange="saveDataToFirebase()"><option value="">-- Válassz --</option></select></td>
+                    <td><input type="number" id="home_set_${i}_0" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                    <td><input type="number" id="home_set_${i}_1" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                    <td><input type="number" id="home_set_${i}_2" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                    <td><input type="number" id="home_set_${i}_3" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                    
+                    <td><select id="away_player_${i}" onchange="saveDataToFirebase()"><option value="">-- Válassz --</option></select></td>
+                    <td><input type="number" id="away_set_${i}_0" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                    <td><input type="number" id="away_set_${i}_1" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                    <td><input type="number" id="away_set_${i}_2" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                    <td><input type="number" id="away_set_${i}_3" class="set-input" value="0" min="0" oninput="saveDataToFirebase()"></td>
+                </tr>
+            `;
+        }
+    }
+
+    function updateTeamPlayers(side) {
+        const teamName = document.getElementById(side === 'home' ? 'homeTeam' : 'awayTeam').value;
+        const players = database[teamName] || [];
+
+        for (let i = 1; i <= 6; i++) {
+            const select = document.getElementById(`${side}_player_${i}`);
+            const currentValue = select.value;
+            select.innerHTML = `<option value="">-- Válassz --</option>`;
+            players.forEach(playerName => {
+                select.innerHTML += `<option value="${playerName}" ${playerName === currentValue ? 'selected' : ''}>${playerName}</option>`;
+            });
+        }
+    }
+
+    function saveDataToFirebase() {
+        document.getElementById('syncStatus').innerText = "Mentés...";
+        
+        const matchData = {
+            title: currentCategory === 'adult' ? "Felnőtt Bajnoki Mérkőzés" : "Ifi Bajnoki Mérkőzés",
+            team1: document.getElementById('homeTeam').value || "HAZAI",
+            team2: document.getElementById('awayTeam').value || "VENDÉG",
+            logo1: "https://raw.githubusercontent.com/tvseteke-tse/Komplett-bajnoki/main/ttse.png",
+            logo2: "",
+            pairs: []
+        };
+
+        for (let i = 1; i <= 6; i++) {
+            matchData.pairs.push({
+                p1Name: document.getElementById(`home_player_${i}`).value || `Hazai játékos ${i}`,
+                p2Name: document.getElementById(`away_player_${i}`).value || `Vendég játékos ${i}`,
+                p1Sets: [
+                    parseInt(document.getElementById(`home_set_${i}_0`).value) || 0,
+                    parseInt(document.getElementById(`home_set_${i}_1`).value) || 0,
+                    parseInt(document.getElementById(`home_set_${i}_2`).value) || 0,
+                    parseInt(document.getElementById(`home_set_${i}_3`).value) || 0
+                ],
+                p2Sets: [
+                    parseInt(document.getElementById(`away_set_${i}_0`).value) || 0,
+                    parseInt(document.getElementById(`away_set_${i}_1`).value) || 0,
+                    parseInt(document.getElementById(`away_set_${i}_2`).value) || 0,
+                    parseInt(document.getElementById(`away_set_${i}_3`).value) || 0
+                ],
+                activeSet: 0,
+                activePlayer: 1
+            });
+        }
+
+        db.ref(`osszevont_bajnoki_bowling/${currentCategory}`).set(matchData)
+            .then(() => {
+                document.getElementById('syncStatus').innerText = "Adatok szinkronizálva ✔";
+            })
+            .catch((error) => {
+                document.getElementById('syncStatus').innerText = "Hiba a mentésnél!";
+                console.error(error);
+            });
+    }
+
+    function loadDataFromFirebase(cat) {
+        db.ref(`osszevont_bajnoki_bowling/${cat}`).once('value', (snapshot) => {
+            const data = snapshot.val();
+            if (!data) return;
+
+            if (data.team1) {
+                document.getElementById('homeTeam').value = data.team1;
+                updateTeamPlayers('home');
+            }
+            if (data.team2) {
+                document.getElementById('awayTeam').value = data.team2;
+                updateTeamPlayers('away');
+            }
+
+            if (data.pairs && Array.isArray(data.pairs)) {
+                data.pairs.forEach((pair, index) => {
+                    let i = index + 1;
+                    if (document.getElementById(`home_player_${i}`)) {
+                        document.getElementById(`home_player_${i}`).value = pair.p1Name || "";
+                        document.getElementById(`away_player_${i}`).value = pair.p2Name || "";
+
+                        for (let s = 0; s < 4; s++) {
+                            document.getElementById(`home_set_${i}_${s}`).value = pair.p1Sets ? pair.p1Sets[s] || 0 : 0;
+                            document.getElementById(`away_set_${i}_${s}`).value = pair.p2Sets ? pair.p2Sets[s] || 0 : 0;
+                        }
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
