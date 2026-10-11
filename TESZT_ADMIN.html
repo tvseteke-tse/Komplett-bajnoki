@@ -28,13 +28,13 @@
     <div class="match-setup">
         <div class="team-select-box">
             <label for="homeTeam">Hazai Csapat:</label>
-            <select id="homeTeam" onchange="updatePlayers('home')">
+            <select id="homeTeam" onchange="updateTeamPlayers('home')">
                 <option value="">-- Válassz hazai csapatot --</option>
             </select>
         </div>
         <div class="team-select-box">
             <label for="awayTeam">Vendég Csapat:</label>
-            <select id="awayTeam" onchange="updatePlayers('away')">
+            <select id="awayTeam" onchange="updateTeamPlayers('away')">
                 <option value="">-- Válassz vendég csapatot --</option>
             </select>
         </div>
@@ -65,7 +65,6 @@
 </div>
 
 <script>
-    // Csak a nevek és csapatok adatbázisa
     const database = {
         "Bátonyterenyei TK": [
             "Fancsik István", "Gál Csanád", "Gál Levente", "Hetei Arnold", "Horváth János", 
@@ -110,4 +109,85 @@
             "Ifj. Székely Károly", "Juhász Marcell Donát", "Nyári Krisztofer", "Pintér Lajos", 
             "Szabó Gábor", "Tóth Zoltán", "Varga István"
         ],
-        "Tiszaké
+        "Tiszakécske TSE": [
+            "Bese Ferenc", "Dömötör Balázs", "Ézsiás Kristóf", "Hűvös Zsolt", "Kecskeméti Sebestyén Dominik", 
+            "Kiss Viktor", "Kokavecz Dávid", "Kokavecz Ferenc", "Méri Martin Márk", "Óháti Imre László", 
+            "Schiffert Dominik", "Schiffert Roland", "Sulák Olivér", "Szabó Zsolt", "Szarka Péter", "Váradi Kálmán Zsombor"
+        ],
+        "Tüker TSE": [
+            "Andróni Csaba", "Auer Mátyás", "Barkó Csaba", "Csesznok Tamás", "Gál Lajos", 
+            "Gulyás Csaba Miklós", "Kehl Zoltán", "Pocsal Bálint", "Puporka Krisztián Aladár", 
+            "Sáfián Kornél", "Takács Zoltán", "Tóth Dénes"
+        ],
+        "VILLJAV PRIMA SE": [
+            "Bencsik Attila", "Czakó Szabolcs Sándor", "Egyed Ferenc", "Gyuricsák Péter", 
+            "Hercz Richárd Sándor", "Ifj. Szojka Miklós", "Mogyorósi Péter", "Molnár Dávid", 
+            "Szilágyi Sándor", "Szluka István Ferenc", "Szujka Miklós"
+        ]
+    };
+
+    window.onload = function() {
+        const homeSelect = document.getElementById('homeTeam');
+        const awaySelect = document.getElementById('awayTeam');
+
+        for (let team in database) {
+            homeSelect.innerHTML += `<option value="${team}">${team}</option>`;
+            awaySelect.innerHTML += `<option value="${team}">${team}</option>`;
+        }
+
+        generateTableRows();
+    };
+
+    function generateTableRows() {
+        const tbody = document.getElementById('lineupTable');
+        tbody.innerHTML = '';
+        for (let i = 1; i <= 6; i++) {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i}.</td>
+                    <td><select id="home_player_${i}"><option value="">-- Előbb válassz csapatot --</option></select></td>
+                    <td><input type="number" class="home-pin" value="0" min="0" oninput="calculateTotals()"></td>
+                    <td><select id="away_player_${i}"><option value="">-- Előbb válassz csapatot --</option></select></td>
+                    <td><input type="number" class="away-pin" value="0" min="0" oninput="calculateTotals()"></td>
+                    <td><input type="text" value="0:0" style="width: 60px; text-align: center;"></td>
+                </tr>
+            `;
+        }
+    }
+
+    function updateTeamPlayers(side) {
+        const teamName = document.getElementById(side === 'home' ? 'homeTeam' : 'awayTeam').value;
+        const players = database[teamName] || [];
+
+        for (let i = 1; i <= 6; i++) {
+            const select = document.getElementById(`${side}_player_${i}`);
+            select.innerHTML = `<option value="">-- Válassz játékost --</option>`;
+            players.forEach(playerName => {
+                select.innerHTML += `<option value="${playerName}">${playerName}</option>`;
+            });
+        }
+    }
+
+    function calculateTotals() {
+        let homeSum = 0;
+        let awaySum = 0;
+
+        document.querySelectorAll('.home-pin').forEach(input => {
+            homeSum += parseInt(input.value) || 0;
+        });
+
+        document.querySelectorAll('.away-pin').forEach(input => {
+            awaySum += parseInt(input.value) || 0;
+        });
+
+        document.getElementById('homeTotalPins').innerText = homeSum;
+        document.getElementById('awayTotalPins').innerText = awaySum;
+    }
+
+    function exportData() {
+        window.print();
+    }
+</script>
+
+</body>
+</html>
